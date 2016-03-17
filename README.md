@@ -2,28 +2,29 @@
 
 A small, yet full-featured framework that allows building View-based Android applications. Conductor provides a light-weight wrapper around standard Android Views that does just about everything you'd want:
 
-- Simple integration
-- Lifecycle management
-- Navigation and backstack
-- Transitions between Views
-- State persistence
-- Callbacks for onActivityResult, onRequestPermissionsResult, etc
+              |  Conductor
+--------------------------|------------------------------------------------------------
+:sunny: | Simple integration
+:recycle: | Lifecycle management
+:train: | Navigation and backstack
+:twisted_rightwards_arrows: | Transitions between Views
+:floppy_disk: | State persistence
+:phone: | Callbacks for onActivityResult, onRequestPermissionsResult, etc
 	
 Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We at BlueLine Labs tend to use either MVP or MVVM, but it would equally well with standard MVC or whatever else you want to throw at it.
 
-## Download
+## Installation
 
-Add the following line to your build.gradle file to get Conductor:
+```gradle
+compile 'com.bluelinelabs:conductor:1.0.0'
 
-`compile 'com.bluelinelabs:conductor:1.0.0'`
+// If you want the components that go along with
+// Android's support libraries (currently just a PagerAdapter):
+compile 'com.bluelinelabs:conductor-support:1.0.0'
 
-If you want the components that go along with Android's support libraries (currently just a PagerAdapter), you can also add this line:
-
-`compile 'com.bluelinelabs:conductor-support:1.0.0'` 
-
-For RxJava/RxAndroid lifecycle support, add this:
-
-`compile 'com.bluelinelabs:conductor-rxlifecycle:1.0.0'` 
+// If you want RxJava/RxAndroid lifecycle support:
+compile 'com.bluelinelabs:conductor-rxlifecycle:1.0.0'
+```
 
 ## Components to Know
 
