@@ -5,6 +5,7 @@ A small, yet full-featured framework that allows building View-based Android app
               |  Conductor
 ------|------------------------------
 :tada: | Easy integration
+:point_up: | Single Activity apps without using Fragments
 :recycle: | Simple but powerful lifecycle management
 :train: | Navigation and backstack handling
 :twisted_rightwards_arrows: | Beautiful transitions between views
