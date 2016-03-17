@@ -3,15 +3,16 @@
 A small, yet full-featured framework that allows building View-based Android applications. Conductor provides a light-weight wrapper around standard Android Views that does just about everything you'd want:
 
               |  Conductor
---------------------------|------------------------------------------------------------
-:sunny: | Simple integration
-:recycle: | Lifecycle management
-:train: | Navigation and backstack
-:twisted_rightwards_arrows: | Transitions between Views
+------|------------------------------
+:tada: | Easy integration
+:recycle: | Simple but powerful lifecycle management
+:train: | Navigation and backstack handling
+:twisted_rightwards_arrows: | Beautiful transitions between views
 :floppy_disk: | State persistence
 :phone: | Callbacks for onActivityResult, onRequestPermissionsResult, etc
+:european_post_office: | MVP / MVVM / VIPER / MVC ready
 	
-Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We at BlueLine Labs tend to use either MVP or MVVM, but it would equally well with standard MVC or whatever else you want to throw at it.
+Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We here at BlueLine Labs tend to use either MVP or MVVM, but it would equally well with standard MVC or whatever else you want to throw at it.
 
 ## Installation
 
@@ -101,18 +102,18 @@ public class HomeController extends Controller {
 
 [Demo app](https://github.com/bluelinelabs/conductor/tree/master/demo) - Shows how to use all basic and most advanced functions of Conductor.
 
-### Advanced Topics
+## Advanced Topics
 
-#### Retain View Modes
+### Retain View Modes
 `setRetainViewMode` can be called on a `Controller` with one of two values: `RELEASE_DETACH`, which will release the `Controller`'s view as soon as it is detached from the screen (saves memory), or `RETAIN_DETACH`, which will ensure that a `Controller` holds on to its view, even if it's not currently shown on the screen (good for views that are expensive to re-create).
 
-#### Custom Change Handlers
+### Custom Change Handlers
 `ControllerChangeHandler` can be subclassed in order to perform different functions when changing between two `Controllers`. Two convenience `ControllerChangeHandler` subclasses are included to cover most basic needs: `AnimatorChangeHandler`, which will use an `Animator` object to transition between two views, and `TransitionChangeHandler`, which will use Lollipop's `Transition` framework for transitioning between views.
 
-#### Child Controllers
+### Child Controllers
 `addChildController` can be called on a `Controller` in order to add nested `Controller`s. Child `Controller`s will receive all lifecycle callbacks that parents get.
 
-#### RxJava Lifecycle
+### RxJava Lifecycle
 If the RxLifecycle dependency has been added, there is an `RxController` available that can be used along with the standard [RxLifecycle library](https://github.com/trello/RxLifecycle). There is also a `ControllerLifecycleProvider` available if you do not wish to use this subclass. 
 
 ## License
