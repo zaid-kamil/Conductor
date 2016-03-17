@@ -47,7 +47,7 @@ Transactions are used to define data about adding Controllers. RouterControllerT
 
 ## Getting Started
 
-### Minimal MainActivity implementation
+### Minimal Activity implementation
 
 ```
 public class MainActivity extends Activity {
