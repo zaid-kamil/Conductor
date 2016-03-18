@@ -50,6 +50,7 @@ public abstract class Controller {
     private final Bundle mArgs;
 
     private Bundle mViewState;
+    private boolean mIsBeingDestroyed;
     private boolean mDestroyed;
     private boolean mAttached;
     private Router mRouter;
@@ -166,6 +167,13 @@ public abstract class Controller {
      */
     public final boolean isDestroyed() {
         return mDestroyed;
+    }
+
+    /**
+     * Returns whether or not this Controller is currently in the process of being destroyed.
+     */
+    public final boolean isBeingDestroyed() {
+        return mIsBeingDestroyed;
     }
 
     /**
@@ -660,7 +668,7 @@ public abstract class Controller {
                 }
             }
 
-            if (mRetainViewMode == RetainViewMode.RELEASE_DETACH || mDestroyed) {
+            if (mRetainViewMode == RetainViewMode.RELEASE_DETACH || mIsBeingDestroyed) {
                 removeViewReference();
             }
 
@@ -684,6 +692,10 @@ public abstract class Controller {
                 lifecycleListener.postUnbindView(this);
             }
         }
+
+        if (mIsBeingDestroyed) {
+            performDestroy();
+        }
     }
 
     final View inflate(@NonNull ViewGroup parent) {
@@ -697,20 +709,31 @@ public abstract class Controller {
         }
     }
 
-    final void destroy() {
-        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-            lifecycleListener.preDestroy(this);
-        }
+    final void performDestroy() {
+        if (!mDestroyed) {
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.preDestroy(this);
+            }
 
-        mDestroyed = true;
-        onDestroy();
+            mDestroyed = true;
+
+            onDestroy();
+
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.postDestroy(this);
+            }
+        }
+    }
+
+    final void destroy() {
+        mIsBeingDestroyed = true;
 
         for (ChildControllerTransaction child : mChildControllers) {
             child.controller.destroy();
         }
 
-        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-            lifecycleListener.postDestroy(this);
+        if (!mAttached) {
+            removeViewReference();
         }
     }
 

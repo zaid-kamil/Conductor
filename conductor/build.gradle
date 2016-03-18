@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'de.mobilej.unmock:UnMockPlugin:0.3.6'
+    }
+}
+
 apply plugin: 'com.android.library'
+apply plugin: 'de.mobilej.unmock'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -26,6 +36,14 @@ dependencies {
     testCompile rootProject.ext.roboelectric
 
     compile rootProject.ext.supportAnnotations
+}
+
+unMock {
+    downloadFrom 'https://oss.sonatype.org/content/groups/public/org/robolectric/android-all/4.3_r2-robolectric-0/android-all-4.3_r2-robolectric-0.jar'
+
+    keep "android.os.Bundle"
+    keep "android.os.BaseBundle"
+    keep "android.text.TextUtils"
 }
 
 ext.artifactId = 'conductor'

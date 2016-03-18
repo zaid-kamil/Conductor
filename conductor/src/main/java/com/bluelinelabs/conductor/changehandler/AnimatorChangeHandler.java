@@ -54,6 +54,14 @@ public abstract class AnimatorChangeHandler extends ControllerChangeHandler {
         mRemovesFromViewOnPush = bundle.getBoolean(KEY_REMOVES_FROM_ON_PUSH);
     }
 
+    public long getAnimationDuration() {
+        return mAnimationDuration;
+    }
+
+    public boolean removesFromViewOnPush() {
+        return mRemovesFromViewOnPush;
+    }
+
     /**
      * Should be overridden to return the Animator to use while replacing Views.
      *

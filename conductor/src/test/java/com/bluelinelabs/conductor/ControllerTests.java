@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.bluelinelabs.conductor.Controller.LifecycleListener;
+import com.bluelinelabs.conductor.Controller.RetainViewMode;
 import com.bluelinelabs.conductor.ControllerChangeHandler.ControllerChangeCompletedListener;
 import com.bluelinelabs.conductor.ControllerTransaction.ControllerChangeType;
 
@@ -66,6 +67,8 @@ public class ControllerTests {
 
         mRouter.popCurrentController();
 
+        Assert.assertNull(controller.getView());
+
         assertCalls(2, 2, 1, 1, 1, 1, 1);
     }
 
@@ -91,8 +94,9 @@ public class ControllerTests {
         assertCalls(1, 1, 1, 1, 0, 0, 0);
 
         mActivityController.destroy();
+        ViewUtils.setAttached(controller.getView(), false);
 
-        assertCalls(1, 1, 1, 1, 0, 0, 1);
+        assertCalls(1, 1, 1, 1, 1, 1, 1);
     }
 
     @Test
@@ -168,6 +172,34 @@ public class ControllerTests {
         assertCalls(1, 1, 1, 1, 1, 1, 1);
     }
 
+    @Test
+    public void testViewRetention() {
+        Controller controller = new TestController();
+
+        // Test View getting released w/ RELEASE_DETACH
+        controller.setRetainViewMode(RetainViewMode.RELEASE_DETACH);
+        Assert.assertNull(controller.getView());
+        View view = controller.inflate(new FrameLayout(mRouter.getActivity()));
+        Assert.assertNull(controller.getView());
+        ViewUtils.setAttached(view, true);
+        Assert.assertNotNull(controller.getView());
+        ViewUtils.setAttached(view, false);
+        Assert.assertNull(controller.getView());
+
+        // Test View getting retained w/ RETAIN_DETACH
+        controller.setRetainViewMode(RetainViewMode.RETAIN_DETACH);
+        view = controller.inflate(new FrameLayout(mRouter.getActivity()));
+        Assert.assertNull(controller.getView());
+        ViewUtils.setAttached(view, true);
+        Assert.assertNotNull(controller.getView());
+        ViewUtils.setAttached(view, false);
+        Assert.assertNotNull(controller.getView());
+
+        // Ensure re-setting RELEASE_DETACH releases
+        controller.setRetainViewMode(RetainViewMode.RELEASE_DETACH);
+        Assert.assertNull(controller.getView());
+    }
+
     private ChangeHandler getPushHandler(final int changeStart, final int changeEnd, final int bindView, final int attach, final int unbindView, final int detach, final int destroy) {
         return new ChangeHandler(new ChangeHandlerListener() {
             @Override
@@ -185,7 +217,7 @@ public class ControllerTests {
         return new ChangeHandler(new ChangeHandlerListener() {
             @Override
             public void performChange(@NonNull ViewGroup container, View from, View to, boolean isPush, @NonNull ControllerChangeCompletedListener changeListener) {
-                assertCalls(changeStart + 1, changeEnd, bindView, attach, unbindView, detach, destroy + 1);
+                assertCalls(changeStart + 1, changeEnd, bindView, attach, unbindView, detach, destroy);
                 container.removeView(from);
                 ViewUtils.setAttached(from, false);
                 assertCalls(changeStart + 1, changeEnd, bindView, attach, unbindView + 1, detach + 1, destroy + 1);
