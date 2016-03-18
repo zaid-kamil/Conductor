@@ -105,6 +105,12 @@ public class HomeController extends Controller {
 
 [Demo app](https://github.com/bluelinelabs/conductor/tree/master/demo) - Shows how to use all basic and most advanced functions of Conductor.
 
+### Controller Lifecycle
+
+The lifecycle of a Controller is significantly simpler to understand than that of a Fragment. A lifecycle diagram is shown below:
+
+![Controller Lifecycle](docs/Controller Lifecycle.jpg)
+
 ## Advanced Topics
 
 ### Retain View Modes
