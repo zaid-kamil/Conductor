@@ -248,6 +248,21 @@ public class Router {
     }
 
     /**
+     * Returns the hosted Controller that was pushed with the given tag, if available.
+     *
+     * @param tag The tag being searched for
+     * @return The matching Controller, if one exists
+     */
+    public Controller getControllerWithTag(String tag) {
+        for (ControllerTransaction transaction : mBackStack) {
+            if (tag.equals(transaction.tag)) {
+                return transaction.controller;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the number of {@link Controller}s currently in the backstack
      */
     public int getBackstackSize() {
