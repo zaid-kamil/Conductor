@@ -13,7 +13,7 @@ A small, yet full-featured framework that allows building View-based Android app
 :phone: | Callbacks for onActivityResult, onRequestPermissionsResult, etc
 :european_post_office: | MVP / MVVM / VIPER / MVC ready
 	
-Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We here at BlueLine Labs tend to use either MVP or MVVM, but it would equally well with standard MVC or whatever else you want to throw at it.
+Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We here at BlueLine Labs tend to use either MVP or MVVM, but it would work equally well with standard MVC or whatever else you want to throw at it.
 
 ## Installation
 
@@ -36,11 +36,11 @@ The Controller is the View wrapper that will give you all of your lifecycle mana
 
 ### Router
 
-The Router is responsible for handling navigation and the backstack. Controllers and pushed and popped in order to display and remove them.
+The Router is responsible for handling navigation and the backstack. Controllers are pushed and popped in order to display and remove them.
 
 ### ControllerChangeHandler
 
-ControllerChangeHandlers are resposible for performing the logic associated with pushing or popping Controllers. The most common implementation of these will be to animate between Controllers.
+ControllerChangeHandlers are responsible for performing the logic associated with pushing or popping Controllers. The most common implementation of these will be to animate between Controllers.
 
 ### ControllerTransaction
 
