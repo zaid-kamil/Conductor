@@ -41,11 +41,11 @@ dependencies {
 
     compile rootProject.ext.butterknife
 
+    compile 'com.bluelinelabs:conductor:' + rootProject.ext.versionName
+    compile 'com.bluelinelabs:conductor-support:' + rootProject.ext.versionName
+    compile 'com.bluelinelabs:conductor-rxlifecycle:' + rootProject.ext.versionName
+
     debugCompile rootProject.ext.leakCanary
     releaseCompile rootProject.ext.leakCanaryNoOp
     testCompile rootProject.ext.leakCanaryNoOp
-
-    compile project(':conductor-support')
-    compile project(':conductor-rxlifecycle')
-
 }
