@@ -146,6 +146,8 @@ public abstract class Controller {
         for (int i = mChildControllers.size() - 1; i >= 0; i--) {
             ChildControllerTransaction childTransaction = mChildControllers.get(i);
             if (childTransaction.controller == controller) {
+                childTransaction.controller.destroy();
+
                 childTransaction.controller.mParentController = null;
 
                 if (controller.mView != null && controller.mView.getParent() != null) {
@@ -153,7 +155,6 @@ public abstract class Controller {
                     ControllerChangeHandler.executeChange(null, controller, false, container, childTransaction.getPopControllerChangeHandler());
                 }
 
-                childTransaction.controller.destroy();
                 mChildControllers.remove(i);
                 break;
             }

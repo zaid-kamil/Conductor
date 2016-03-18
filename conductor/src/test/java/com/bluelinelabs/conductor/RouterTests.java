@@ -1,10 +1,6 @@
 package com.bluelinelabs.conductor;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import org.junit.Assert;
@@ -43,13 +39,28 @@ public class RouterTests {
     }
 
     @Test
+    public void testSetNewRoot() {
+        String oldRootTag = "oldRoot";
+        String newRootTag = "newRoot";
+
+        Controller oldRootController = new TestController();
+        Controller newRootController = new TestController();
+
+        mRouter.setRoot(oldRootController, oldRootTag);
+        mRouter.setRoot(newRootController, newRootTag);
+
+        Assert.assertNull(mRouter.getControllerWithTag(oldRootTag));
+        Assert.assertEquals(newRootController, mRouter.getControllerWithTag(newRootTag));
+    }
+
+    @Test
     public void testGetByInstanceId() {
         Controller controller = new TestController();
 
         mRouter.pushController(RouterTransaction.builder(controller).build());
 
-        Assert.assertEquals(mRouter.getControllerWithInstanceId(controller.getInstanceId()), controller);
-        Assert.assertEquals(mRouter.getControllerWithInstanceId("fake id"), null);
+        Assert.assertEquals(controller, mRouter.getControllerWithInstanceId(controller.getInstanceId()));
+        Assert.assertNull(mRouter.getControllerWithInstanceId("fake id"));
     }
 
     @Test
@@ -68,8 +79,8 @@ public class RouterTests {
                 .tag(controller2Tag)
                 .build());
 
-        Assert.assertEquals(mRouter.getControllerWithTag(controller1Tag), controller1);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller2Tag), controller2);
+        Assert.assertEquals(controller1, mRouter.getControllerWithTag(controller1Tag));
+        Assert.assertEquals(controller2, mRouter.getControllerWithTag(controller2Tag));
     }
 
     @Test
@@ -84,27 +95,27 @@ public class RouterTests {
                 .tag(controller1Tag)
                 .build());
 
-        Assert.assertEquals(mRouter.getBackstackSize(), 1);
+        Assert.assertEquals(1, mRouter.getBackstackSize());
 
         mRouter.pushController(RouterTransaction.builder(controller2)
                 .tag(controller2Tag)
                 .build());
 
-        Assert.assertEquals(mRouter.getBackstackSize(), 2);
+        Assert.assertEquals(2, mRouter.getBackstackSize());
 
         mRouter.popCurrentController();
 
-        Assert.assertEquals(mRouter.getBackstackSize(), 1);
+        Assert.assertEquals(1, mRouter.getBackstackSize());
 
-        Assert.assertEquals(mRouter.getControllerWithTag(controller1Tag), controller1);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller2Tag), null);
+        Assert.assertEquals(controller1, mRouter.getControllerWithTag(controller1Tag));
+        Assert.assertNull(mRouter.getControllerWithTag(controller2Tag));
 
         mRouter.popCurrentController();
 
-        Assert.assertEquals(mRouter.getBackstackSize(), 0);
+        Assert.assertEquals(0, mRouter.getBackstackSize());
 
-        Assert.assertEquals(mRouter.getControllerWithTag(controller1Tag), null);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller2Tag), null);
+        Assert.assertNull(mRouter.getControllerWithTag(controller1Tag));
+        Assert.assertNull(mRouter.getControllerWithTag(controller2Tag));
     }
 
     @Test
@@ -137,24 +148,41 @@ public class RouterTests {
 
         mRouter.popToTag(controller2Tag);
 
-        Assert.assertEquals(mRouter.getBackstackSize(), 2);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller1Tag), controller1);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller2Tag), controller2);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller3Tag), null);
-        Assert.assertEquals(mRouter.getControllerWithTag(controller4Tag), null);
+        Assert.assertEquals(2, mRouter.getBackstackSize());
+        Assert.assertEquals(controller1, mRouter.getControllerWithTag(controller1Tag));
+        Assert.assertEquals(controller2, mRouter.getControllerWithTag(controller2Tag));
+        Assert.assertNull(mRouter.getControllerWithTag(controller3Tag));
+        Assert.assertNull(mRouter.getControllerWithTag(controller4Tag));
     }
 
-    static class TestActivity extends Activity { }
+    @Test
+    public void testPopNonCurrent() {
+        String controller1Tag = "controller1";
+        String controller2Tag = "controller2";
+        String controller3Tag = "controller3";
 
-    static class TestController extends Controller {
+        Controller controller1 = new TestController();
+        Controller controller2 = new TestController();
+        Controller controller3 = new TestController();
 
-        public TestController() { }
+        mRouter.pushController(RouterTransaction.builder(controller1)
+                .tag(controller1Tag)
+                .build());
 
-        @NonNull
-        @Override
-        protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-            return new View(inflater.getContext());
-        }
+        mRouter.pushController(RouterTransaction.builder(controller2)
+                .tag(controller2Tag)
+                .build());
 
+        mRouter.pushController(RouterTransaction.builder(controller3)
+                .tag(controller3Tag)
+                .build());
+
+        mRouter.popController(controller2);
+
+        Assert.assertEquals(2, mRouter.getBackstackSize());
+        Assert.assertEquals(controller1, mRouter.getControllerWithTag(controller1Tag));
+        Assert.assertNull(mRouter.getControllerWithTag(controller2Tag));
+        Assert.assertEquals(controller3, mRouter.getControllerWithTag(controller3Tag));
     }
+
 }
