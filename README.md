@@ -32,21 +32,12 @@ compile 'com.bluelinelabs:conductor-rxlifecycle:1.0.2'
 
 ## Components to Know
 
-### Controller
-
-The Controller is the View wrapper that will give you all of your lifecycle management features. Think of it as a lighter-weight and more predictable Fragment alternative with an easier to manage lifecycle.
-
-### Router
-
-The Router is responsible for handling navigation and the backstack. Controllers are pushed and popped in order to display and remove them.
-
-### ControllerChangeHandler
-
-ControllerChangeHandlers are responsible for performing the logic associated with pushing or popping Controllers. The most common implementation of these will be to animate between Controllers.
-
-### ControllerTransaction
-
-Transactions are used to define data about adding Controllers. RouterControllerTransactions are used to push a Controller to a Router with specified ControllerChangeHandlers, while ChildControllerTransactions are used to add child Controllers.
+              |  Conductor Components
+------|------------------------------
+__Controller__ | The Controller is the View wrapper that will give you all of your lifecycle management features. Think of it as a lighter-weight and more predictable Fragment alternative with an easier to manage lifecycle.
+__Router__ | The Router is responsible for handling navigation and the backstack. Controllers are pushed and popped in order to display and remove them.
+__ControllerChangeHandler__ | ControllerChangeHandlers are responsible for performing the logic associated with pushing or popping Controllers. The most common implementation of these will be to animate between Controllers.
+__ControllerTransaction__ | Transactions are used to define data about adding Controllers. RouterControllerTransactions are used to push a Controller to a Router with specified ControllerChangeHandlers, while ChildControllerTransactions are used to add child Controllers.
 
 ## Getting Started
 
