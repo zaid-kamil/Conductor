@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.ControllerChangeHandler;
-import com.bluelinelabs.conductor.util.ClassUtils;
+import com.bluelinelabs.conductor.internal.ClassUtils;
 
 /**
  * A base {@link ControllerChangeHandler} that facilitates using {@link android.transition.Transition}s to replace Controller Views.

@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.ControllerTransaction.ControllerChangeType;
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler;
-import com.bluelinelabs.conductor.util.ClassUtils;
+import com.bluelinelabs.conductor.internal.ClassUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

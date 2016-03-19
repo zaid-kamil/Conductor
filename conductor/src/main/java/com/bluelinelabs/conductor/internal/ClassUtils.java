@@ -1,4 +1,4 @@
-package com.bluelinelabs.conductor.util;
+package com.bluelinelabs.conductor.internal;
 
 import android.text.TextUtils;
 
