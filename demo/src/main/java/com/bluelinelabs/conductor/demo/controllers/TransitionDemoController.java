@@ -19,7 +19,7 @@ import com.bluelinelabs.conductor.changehandler.CircularRevealChangeHandler;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler;
-import com.bluelinelabs.conductor.demo.BundleBuilder;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.changehandler.ArcFadeMoveChangeHandlerCompat;
 import com.bluelinelabs.conductor.demo.changehandler.FlipChangeHandler;

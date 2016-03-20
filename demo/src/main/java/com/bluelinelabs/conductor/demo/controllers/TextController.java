@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bluelinelabs.conductor.demo.BundleBuilder;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
 

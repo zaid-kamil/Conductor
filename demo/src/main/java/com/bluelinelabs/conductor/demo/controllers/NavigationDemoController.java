@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
-import com.bluelinelabs.conductor.demo.BundleBuilder;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
 import com.bluelinelabs.conductor.demo.util.ColorUtil;

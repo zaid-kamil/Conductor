@@ -1,4 +1,4 @@
-package com.bluelinelabs.conductor.demo;
+package com.bluelinelabs.conductor.demo.util;
 
 import android.os.Bundle;
 import android.os.Parcelable;

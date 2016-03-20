@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-import com.bluelinelabs.conductor.demo.App;
+import com.bluelinelabs.conductor.demo.DemoApplication;
 
 public abstract class RefWatchingController extends ButterKnifeController {
 
@@ -18,16 +18,16 @@ public abstract class RefWatchingController extends ButterKnifeController {
         super.onDetach(view);
 
         if (isDestroyed()) {
-            App.refWatcher.watch(view);
+            DemoApplication.refWatcher.watch(view);
         }
     }
 
     @Override
     public void onDestroy() {
         if (getView() !=  null) {
-            App.refWatcher.watch(getView());
+            DemoApplication.refWatcher.watch(getView());
         }
-        App.refWatcher.watch(this);
+        DemoApplication.refWatcher.watch(this);
     }
 
 }
