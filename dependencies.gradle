@@ -5,8 +5,8 @@ ext {
     buildToolsVersion = '23.0.2'
 
     versionCode = 1
-    versionName = '1.0.2'
-    publishedVersionName = '1.0.2'
+    versionName = '1.0.3'
+    publishedVersionName = '1.0.3'
 
     supportV4 = 'com.android.support:support-v4:23.1.1'
     supportDesign = 'com.android.support:design:23.1.1'
@@ -24,4 +24,7 @@ ext {
 
     junit = 'junit:junit:4.11'
     roboelectric = 'org.robolectric:robolectric:3.0'
+
+    lintapi = 'com.android.tools.lint:lint-api:24.5.0'
+    lintchecks = 'com.android.tools.lint:lint-checks:24.5.0'
 }

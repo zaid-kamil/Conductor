@@ -31,11 +31,17 @@ android {
     }
 }
 
+configurations {
+    lintChecks
+}
+
 dependencies {
     testCompile rootProject.ext.junit
     testCompile rootProject.ext.roboelectric
 
     compile rootProject.ext.supportAnnotations
+
+    lintChecks project(path: ':conductor-lint', configuration: 'lintChecks')
 }
 
 unMock {
@@ -44,6 +50,18 @@ unMock {
     keep "android.os.Bundle"
     keep "android.os.BaseBundle"
     keep "android.text.TextUtils"
+}
+
+task copyLintJar(type: Copy) {
+    from(configurations.lintChecks) {
+        rename { 'lint.jar' }
+    }
+    into 'build/intermediates/lint/'
+}
+
+project.afterEvaluate {
+    def compileLintTask = project.tasks.find { it.name == 'compileLint' }
+    compileLintTask.dependsOn(copyLintJar)
 }
 
 ext.artifactId = 'conductor'

@@ -279,7 +279,7 @@ public class ControllerTests {
         void performChange(@NonNull ViewGroup container, View from, View to, boolean isPush, @NonNull ControllerChangeCompletedListener changeListener);
     }
 
-    static class ChangeHandler extends ControllerChangeHandler {
+    public static class ChangeHandler extends ControllerChangeHandler {
 
         private ChangeHandlerListener mListener;
 
