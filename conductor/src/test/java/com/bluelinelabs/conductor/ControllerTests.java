@@ -180,7 +180,7 @@ public class ControllerTests {
         controller.setRetainViewMode(RetainViewMode.RELEASE_DETACH);
         Assert.assertNull(controller.getView());
         View view = controller.inflate(new FrameLayout(mRouter.getActivity()));
-        Assert.assertNull(controller.getView());
+        Assert.assertNotNull(controller.getView());
         ViewUtils.setAttached(view, true);
         Assert.assertNotNull(controller.getView());
         ViewUtils.setAttached(view, false);
@@ -189,7 +189,7 @@ public class ControllerTests {
         // Test View getting retained w/ RETAIN_DETACH
         controller.setRetainViewMode(RetainViewMode.RETAIN_DETACH);
         view = controller.inflate(new FrameLayout(mRouter.getActivity()));
-        Assert.assertNull(controller.getView());
+        Assert.assertNotNull(controller.getView());
         ViewUtils.setAttached(view, true);
         Assert.assertNotNull(controller.getView());
         ViewUtils.setAttached(view, false);
