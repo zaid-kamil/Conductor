@@ -37,28 +37,33 @@ public class ParentController extends RefWatchingController {
     }
 
     private void addChild(final int index) {
-        int frameId = getResources().getIdentifier("child_content_" + (index + 1), "id", getActivity().getPackageName());
+        String tag = "child_tag" + index;
 
-        ChildController childController = new ChildController("Child Controller #" + index, ColorUtil.getMaterialColor(getResources(), index), false);
-        addChildController(ChildControllerTransaction.builder(childController, frameId)
-                .pushChangeHandler(new FadeChangeHandler())
-                .popChangeHandler(new FadeChangeHandler())
-                .build());
+        if (getChildController(tag) == null) {
+            int frameId = getResources().getIdentifier("child_content_" + (index + 1), "id", getActivity().getPackageName());
 
-        childController.addLifecycleListener(new LifecycleListener() {
-            @Override
-            public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
-                if (changeType == ControllerChangeType.PUSH_ENTER && index < NUMBER_OF_CHILDREN - 1) {
-                    addChild(index + 1);
-                } else if (changeType == ControllerChangeType.POP_EXIT) {
-                    if (index > 0) {
-                        removeChild(index - 1);
-                    } else {
-                        getRouter().popController(ParentController.this);
+            ChildController childController = new ChildController("Child Controller #" + index, ColorUtil.getMaterialColor(getResources(), index), false);
+            addChildController(ChildControllerTransaction.builder(childController, frameId)
+                    .pushChangeHandler(new FadeChangeHandler())
+                    .popChangeHandler(new FadeChangeHandler())
+                    .tag(tag)
+                    .build());
+
+            childController.addLifecycleListener(new LifecycleListener() {
+                @Override
+                public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
+                    if (changeType == ControllerChangeType.PUSH_ENTER && index < NUMBER_OF_CHILDREN - 1) {
+                        addChild(index + 1);
+                    } else if (changeType == ControllerChangeType.POP_EXIT) {
+                        if (index > 0) {
+                            removeChild(index - 1);
+                        } else {
+                            getRouter().popController(ParentController.this);
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void removeChild(int index) {

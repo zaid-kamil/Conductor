@@ -335,6 +335,12 @@ public class Router {
     }
 
     public final void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        if (activity.isChangingConfigurations()) {
+            for (RouterTransaction transaction : mBackStack) {
+                transaction.controller.prepareForConfigurationChange();
+            }
+        }
+
         mBackStack.saveInstanceState(outState);
     }
 

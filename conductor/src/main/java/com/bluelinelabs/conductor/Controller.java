@@ -541,6 +541,10 @@ public abstract class Controller {
         mOverriddenPopHandler = overriddenPopHandler;
     }
 
+    final void prepareForConfigurationChange() {
+        mNeedsAttach = mNeedsAttach || mAttached;
+    }
+
     final boolean getNeedsAttach() {
         return mNeedsAttach;
     }

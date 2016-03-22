@@ -45,6 +45,9 @@ dependencies {
     compile 'com.bluelinelabs:conductor-support:' + rootProject.ext.publishedVersionName
     compile 'com.bluelinelabs:conductor-rxlifecycle:' + rootProject.ext.publishedVersionName
 
+//    compile project(':conductor-support')
+//    compile project(':conductor-rxlifecycle')
+
     debugCompile rootProject.ext.leakCanary
     releaseCompile rootProject.ext.leakCanaryNoOp
     testCompile rootProject.ext.leakCanaryNoOp
