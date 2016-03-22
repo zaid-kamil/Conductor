@@ -637,7 +637,6 @@ public abstract class Controller {
 
         mAttached = true;
         mNeedsAttach = false;
-        mView = view;
 
         for (ChildControllerTransaction child : mChildControllers) {
             attachChildController(child, new SimpleSwapChangeHandler());
@@ -849,6 +848,8 @@ public abstract class Controller {
         for (LifecycleListener lifecycleListener : mLifecycleListeners) {
             lifecycleListener.preBindView(this, view);
         }
+
+        mView = view;
 
         onBindView(view);
 
