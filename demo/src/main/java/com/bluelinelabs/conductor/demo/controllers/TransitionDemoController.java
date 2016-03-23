@@ -58,7 +58,7 @@ public class TransitionDemoController extends RefWatchingController {
 
     @Bind(R.id.tv_title) TextView mTvTitle;
     @Bind(R.id.btn_next) FloatingActionButton mBtnNext;
-    View mContainerView;
+    @Bind(R.id.transition_root) View mContainerView;
 
     private TransitionDemo mTransitionDemo;
 
@@ -71,6 +71,12 @@ public class TransitionDemoController extends RefWatchingController {
     public TransitionDemoController(Bundle args) {
         super(args);
         mTransitionDemo = TransitionDemo.fromIndex(args.getInt(KEY_INDEX));
+    }
+
+    @NonNull
+    @Override
+    protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        return inflater.inflate(mTransitionDemo.layoutId, container, false);
     }
 
     @Override
@@ -92,14 +98,7 @@ public class TransitionDemoController extends RefWatchingController {
         }
 
         mBtnNext.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), buttonColor)));
-        mContainerView = view;
         mTvTitle.setText(mTransitionDemo.title);
-    }
-
-    @NonNull
-    @Override
-    protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        return inflater.inflate(mTransitionDemo.layoutId, container, false);
     }
 
     @OnClick(R.id.btn_next) void onNextClicked() {
@@ -143,4 +142,5 @@ public class TransitionDemoController extends RefWatchingController {
                 .popChangeHandler(changeHandler)
                 .build();
     }
+
 }
