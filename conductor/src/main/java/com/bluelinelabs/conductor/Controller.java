@@ -735,7 +735,7 @@ public abstract class Controller {
             child.controller.destroy();
         }
 
-        if (mAttached) {
+        if (!mAttached) {
             removeViewReference();
         }
     }
