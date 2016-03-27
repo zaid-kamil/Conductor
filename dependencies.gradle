@@ -5,7 +5,7 @@ ext {
     buildToolsVersion = '23.0.2'
 
     versionCode = 1
-    versionName = '1.0.4'
+    versionName = '1.0.5'
     publishedVersionName = '1.0.4'
 
     supportV4 = 'com.android.support:support-v4:23.1.1'

@@ -346,13 +346,14 @@ public class Router {
 
     public final void onActivityDestroyed(Activity activity) {
         mContainer.setOnHierarchyChangeListener(null);
-        mLifecycleHandler = null;
-        mContainer = null;
         mChangeListeners.clear();
 
         for (RouterTransaction transaction : mBackStack) {
             transaction.controller.activityDestroyed(activity.isChangingConfigurations());
         }
+
+        mLifecycleHandler = null;
+        mContainer = null;
     }
 
     public final void onRestoreInstanceState(Bundle savedInstanceState) {
