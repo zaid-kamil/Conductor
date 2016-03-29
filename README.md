@@ -78,8 +78,8 @@ public class MainActivity extends Activity {
 public class HomeController extends Controller {
 
     @Override
-    protected int layoutId() {
-        return R.layout.controller_overlay;
+    protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        return inflater.inflate(R.layout.controller_home, container, false);
     }
 
     @Override
