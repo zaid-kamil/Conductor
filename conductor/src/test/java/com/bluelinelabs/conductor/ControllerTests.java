@@ -94,7 +94,6 @@ public class ControllerTests {
         assertCalls(1, 1, 1, 1, 0, 0, 0);
 
         mActivityController.destroy();
-        ViewUtils.setAttached(controller.getView(), false);
 
         assertCalls(1, 1, 1, 1, 1, 1, 1);
     }
