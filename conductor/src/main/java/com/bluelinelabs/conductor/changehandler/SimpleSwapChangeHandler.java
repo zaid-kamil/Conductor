@@ -3,7 +3,6 @@ package com.bluelinelabs.conductor.changehandler;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.View.OnAttachStateChangeListener;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.ControllerChangeHandler;
@@ -44,19 +43,10 @@ public class SimpleSwapChangeHandler extends ControllerChangeHandler {
         }
 
         if (to != null && to.getParent() == null) {
-            to.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
-                @Override
-                public void onViewAttachedToWindow(View view) {
-                    view.removeOnAttachStateChangeListener(this);
-                    changeListener.onChangeCompleted();
-                }
-
-                @Override
-                public void onViewDetachedFromWindow(View v) { }
-            });
-
             container.addView(to);
         }
+
+        changeListener.onChangeCompleted();
     }
 
 }

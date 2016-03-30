@@ -199,12 +199,32 @@ public class Router {
     }
 
     /**
-     * Sets the root {@link Controller}. If any {@link Controller} are currently in the backstack, they will be removed.
+     * Sets the root {@link Controller}. If any {@link Controller}s are currently in the backstack, they will be removed.
      *
      * @param controller The new root {@link Controller}
      */
     public void setRoot(@NonNull Controller controller) {
-        setRoot(controller, null);
+        setRoot(controller, null, null);
+    }
+
+    /**
+     * Sets the root {@link Controller}. If any {@link Controller}s are currently in the backstack, they will be removed.
+     *
+     * @param controller The new root {@link Controller}
+     * @param tag The tag to use for this {@link Controller}
+     */
+    public void setRoot(@NonNull Controller controller, String tag) {
+        setRoot(controller, tag, null);
+    }
+
+    /**
+     * Sets the root {@link Controller}. If any {@link Controller}s are currently in the backstack, they will be removed.
+     *
+     * @param controller The new root {@link Controller}
+     * @param changeHandler The {@link ControllerChangeHandler} to use for setting the root
+     */
+    public void setRoot(@NonNull Controller controller, ControllerChangeHandler changeHandler) {
+        setRoot(controller, null, changeHandler);
     }
 
     /**
@@ -212,14 +232,15 @@ public class Router {
      *
      * @param controller The new root {@link Controller}
      * @param tag The tag to use for this {@link Controller}
+     * @param changeHandler The {@link ControllerChangeHandler} to use for setting the root
      */
-    public void setRoot(@NonNull Controller controller, String tag) {
+    public void setRoot(@NonNull Controller controller, String tag, ControllerChangeHandler changeHandler) {
         mContainer.removeAllViews();
         mBackStack.popAll();
 
         RouterTransaction transaction = RouterTransaction.builder(controller)
                 .tag(tag)
-                .pushChangeHandler(new SimpleSwapChangeHandler())
+                .pushChangeHandler(changeHandler != null ? changeHandler : new SimpleSwapChangeHandler())
                 .popChangeHandler(new SimpleSwapChangeHandler())
                 .build();
 

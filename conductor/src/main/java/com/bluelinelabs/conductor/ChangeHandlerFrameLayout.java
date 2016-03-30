@@ -43,11 +43,12 @@ public class ChangeHandlerFrameLayout extends FrameLayout implements ControllerC
 
     @Override
     public void onChangeStarted(Controller to, Controller from, boolean isPush, ViewGroup container, ControllerChangeHandler handler) {
-            mInProgressTransactionCount++;
+        mInProgressTransactionCount++;
     }
 
     @Override
     public void onChangeCompleted(Controller to, Controller from, boolean isPush, ViewGroup container, ControllerChangeHandler handler) {
         mInProgressTransactionCount--;
     }
+
 }
