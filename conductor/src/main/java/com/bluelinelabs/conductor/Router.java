@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
+import com.bluelinelabs.conductor.Controller.LifecycleListener;
 import com.bluelinelabs.conductor.ControllerChangeHandler.ControllerChangeListener;
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler;
 import com.bluelinelabs.conductor.internal.LifecycleHandler;
@@ -26,12 +27,13 @@ public class Router {
     private LifecycleHandler mLifecycleHandler;
     private ViewGroup mContainer;
     private final List<ControllerChangeListener> mChangeListeners = new ArrayList<>();
+    private final List<Controller> mDestroyingControllers = new ArrayList<>();
 
     /**
      * Returns this Router's host Activity
      */
     public Activity getActivity() {
-        return mLifecycleHandler.getLifecycleActivity();
+        return mLifecycleHandler != null ? mLifecycleHandler.getLifecycleActivity() : null;
     }
 
     /**
@@ -102,7 +104,7 @@ public class Router {
         boolean poppingTopController = topController.controller == controller;
 
         if (poppingTopController) {
-            mBackStack.pop();
+            trackDestroyingController(mBackStack.pop());
         } else {
             for (RouterTransaction transaction : mBackStack) {
                 if (transaction.controller == controller) {
@@ -140,7 +142,7 @@ public class Router {
     public void replaceTopController(@NonNull RouterTransaction transaction) {
         RouterTransaction topTransaction = mBackStack.peek();
         if (!mBackStack.isEmpty()) {
-            mBackStack.pop();
+            trackDestroyingController(mBackStack.pop());
         }
 
         pushToBackstack(transaction);
@@ -236,7 +238,7 @@ public class Router {
      */
     public void setRoot(@NonNull Controller controller, String tag, ControllerChangeHandler changeHandler) {
         mContainer.removeAllViews();
-        mBackStack.popAll();
+        trackDestroyingControllers(mBackStack.popAll());
 
         RouterTransaction transaction = RouterTransaction.builder(controller)
                 .tag(tag)
@@ -373,6 +375,10 @@ public class Router {
             transaction.controller.activityDestroyed(activity.isChangingConfigurations());
         }
 
+        for (Controller controller : mDestroyingControllers) {
+            controller.activityDestroyed(activity.isChangingConfigurations());
+        }
+
         mLifecycleHandler = null;
         mContainer = null;
     }
@@ -384,6 +390,7 @@ public class Router {
     private void popToTransaction(@NonNull RouterTransaction transaction, ControllerChangeHandler changeHandler) {
         RouterTransaction topTransaction = mBackStack.peek();
         List<RouterTransaction> poppedTransactions = mBackStack.popTo(transaction);
+        trackDestroyingControllers(poppedTransactions);
 
         if (poppedTransactions.size() > 0) {
             if (changeHandler == null) {
@@ -456,6 +463,23 @@ public class Router {
 
     private void pushToBackstack(@NonNull RouterTransaction entry) {
         mBackStack.push(entry);
+    }
+
+    private void trackDestroyingController(RouterTransaction transaction) {
+        mDestroyingControllers.add(transaction.controller);
+
+        transaction.controller.addLifecycleListener(new LifecycleListener() {
+            @Override
+            public void postDestroy(@NonNull Controller controller) {
+                mDestroyingControllers.remove(controller);
+            }
+        });
+    }
+
+    private void trackDestroyingControllers(List<RouterTransaction> transactions) {
+        for (RouterTransaction transaction : transactions) {
+            trackDestroyingController(transaction);
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -201,14 +202,16 @@ public abstract class Controller {
      * Returns the Resources from the host Activity
      */
     public final Resources getResources() {
-        return getActivity().getResources();
+        Activity activity = getActivity();
+        return activity != null ? activity.getResources() : null;
     }
 
     /**
      * Returns the Application Context derived from the host Activity
      */
     public final Context getApplicationContext() {
-        return getActivity().getApplicationContext();
+        Activity activity = getActivity();
+        return activity != null ? activity.getApplicationContext() : null;
     }
 
     /**
@@ -626,7 +629,7 @@ public abstract class Controller {
         if (isChangingConfigurations) {
             removeViewReference();
         } else {
-            destroy();
+            destroy(true);
         }
 
         for (ChildControllerTransaction child : mChildControllers) {
@@ -729,14 +732,20 @@ public abstract class Controller {
     }
 
     final void destroy() {
+        destroy(false);
+    }
+
+    final void destroy(boolean removeViews) {
         mIsBeingDestroyed = true;
 
         for (ChildControllerTransaction child : mChildControllers) {
-            child.controller.destroy();
+            child.controller.destroy(removeViews);
         }
 
         if (!mAttached) {
             removeViewReference();
+        } else if (removeViews) {
+            detach(mView);
         }
     }
 

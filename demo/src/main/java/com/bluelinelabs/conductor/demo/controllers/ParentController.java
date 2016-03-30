@@ -14,8 +14,6 @@ import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
 import com.bluelinelabs.conductor.demo.util.ColorUtil;
 
-import java.util.List;
-
 public class ParentController extends RefWatchingController {
 
     private static final int NUMBER_OF_CHILDREN = 5;
@@ -37,7 +35,7 @@ public class ParentController extends RefWatchingController {
     }
 
     private void addChild(final int index) {
-        String tag = "child_tag" + index;
+        String tag = Integer.toString(index);
 
         if (getChildController(tag) == null) {
             int frameId = getResources().getIdentifier("child_content_" + (index + 1), "id", getActivity().getPackageName());
@@ -48,27 +46,11 @@ public class ParentController extends RefWatchingController {
                     .popChangeHandler(new FadeChangeHandler())
                     .tag(tag)
                     .build());
-
-            childController.addLifecycleListener(new LifecycleListener() {
-                @Override
-                public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
-                    if (changeType == ControllerChangeType.PUSH_ENTER && index < NUMBER_OF_CHILDREN - 1) {
-                        addChild(index + 1);
-                    } else if (changeType == ControllerChangeType.POP_EXIT) {
-                        if (index > 0) {
-                            removeChild(index - 1);
-                        } else {
-                            getRouter().popController(ParentController.this);
-                        }
-                    }
-                }
-            });
         }
     }
 
     private void removeChild(int index) {
-        List<Controller> childControllers = getChildControllers();
-        removeChildController(childControllers.get(index));
+        removeChildController(getChildControllers().get(index));
     }
 
     @Override
@@ -78,5 +60,27 @@ public class ParentController extends RefWatchingController {
             removeChild(getChildControllers().size() - 1);
         }
         return true;
+    }
+
+    @Override
+    public void addChildController(ChildControllerTransaction transaction) {
+        final int index = Integer.parseInt(transaction.tag);
+
+        transaction.controller.addLifecycleListener(new LifecycleListener() {
+            @Override
+            public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
+                if (changeType == ControllerChangeType.PUSH_ENTER && index < NUMBER_OF_CHILDREN - 1) {
+                    addChild(index + 1);
+                } else if (changeType == ControllerChangeType.POP_EXIT) {
+                    if (index > 0) {
+                        removeChild(index - 1);
+                    } else {
+                        getRouter().popController(ParentController.this);
+                    }
+                }
+            }
+        });
+
+        super.addChildController(transaction);
     }
 }

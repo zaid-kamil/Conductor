@@ -67,10 +67,12 @@ class Backstack implements Iterable<RouterTransaction> {
         mBackStack.push(transaction);
     }
 
-    public void popAll() {
+    public List<RouterTransaction> popAll() {
+        List<RouterTransaction> list = new ArrayList<>();
         while (!isEmpty()) {
-            pop();
+            list.add(pop());
         }
+        return list;
     }
 
     public void saveInstanceState(Bundle outState) {
