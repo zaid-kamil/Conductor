@@ -10,8 +10,10 @@ import com.bluelinelabs.conductor.internal.LifecycleHandler;
 /**
  * Point of initial interaction with Conductor. Used to attach a {@link Router} to your Activity.
  */
-public class Conductor {
-
+public final class Conductor {
+    
+    private Conductor(){}
+    
     /**
      * Conductor will create a {@link Router} that has been initialized for your Activity and containing ViewGroup.
      * If an existing {@link Router} is already associated with this Activity/ViewGroup pair, either in memory
