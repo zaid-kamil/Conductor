@@ -43,7 +43,7 @@ __ControllerTransaction__ | Transactions are used to define data about adding Co
 
 ### Minimal Activity implementation
 
-```
+```java
 public class MainActivity extends Activity {
 
     private Router mRouter;
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
 
 ### Minimal Controller implementation
 
-```
+```java
 public class HomeController extends Controller {
 
     @Override
