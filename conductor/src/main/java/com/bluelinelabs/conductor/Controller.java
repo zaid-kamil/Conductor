@@ -278,6 +278,10 @@ public abstract class Controller {
      * @param target The Controller that is the target of this one.
      */
     public void setTargetController(Controller target) {
+        if (mTargetInstanceId != null) {
+            throw new RuntimeException("Target controller already set. A controller's target may only be set once.");
+        }
+
         mTargetInstanceId = target != null ? target.getInstanceId() : null;
     }
 
