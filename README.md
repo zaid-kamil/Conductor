@@ -14,7 +14,7 @@ A small, yet full-featured framework that allows building View-based Android app
 :floppy_disk: | State persistence
 :phone: | Callbacks for onActivityResult, onRequestPermissionsResult, etc
 :european_post_office: | MVP / MVVM / VIPER / MVC ready
-	
+
 Conductor is architecture-agnostic and does not try to force any design decisions on the developer. We here at BlueLine Labs tend to use either MVP or MVVM, but it would work equally well with standard MVC or whatever else you want to throw at it.
 
 ## Installation
@@ -53,9 +53,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-		
-		ViewGroup container = (ViewGroup)findViewById(R.id.controller_container)
-		
+
+        ViewGroup container = (ViewGroup)findViewById(R.id.controller_container)
+
         mRouter = Conductor.attachRouter(this, container, savedInstanceState);
         if (!mRouter.hasRootController()) {
             mRouter.setRoot(new HomeController());
@@ -78,15 +78,10 @@ public class MainActivity extends Activity {
 public class HomeController extends Controller {
 
     @Override
-    protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        return inflater.inflate(R.layout.controller_home, container, false);
-    }
-
-    @Override
-    public void onBindView(@NonNull View view) {
-        super.onBindView(view);
-		
-		((TextView)view.findViewById(R.id.tv_title)).setText("Hello World");
+    protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        View view = inflater.inflate(R.layout.controller_home, container, false);
+        ((TextView)view.findViewById(R.id.tv_title)).setText("Hello World");
+        return view;
     }
 
 }
