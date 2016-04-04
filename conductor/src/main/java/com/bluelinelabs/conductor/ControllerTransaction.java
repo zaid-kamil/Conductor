@@ -77,10 +77,10 @@ public class ControllerTransaction {
     /**
      * Used to serialize this transaction into a Bundle
      */
-    public Bundle toBundle() {
+    public Bundle detachAndSaveInstanceState() {
         Bundle bundle = new Bundle();
 
-        bundle.putBundle(KEY_VIEW_CONTROLLER_BUNDLE, controller.saveInstanceState());
+        bundle.putBundle(KEY_VIEW_CONTROLLER_BUNDLE, controller.detachAndSaveInstanceState());
 
         if (mPushControllerChangeHandler != null) {
             bundle.putBundle(KEY_PUSH_TRANSITION, mPushControllerChangeHandler.toBundle());

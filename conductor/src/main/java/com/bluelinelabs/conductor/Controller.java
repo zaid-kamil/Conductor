@@ -108,7 +108,8 @@ public abstract class Controller {
 
     /**
      * Called when the controller is ready to display its view. A valid view must be returned. The standard body
-     * for this method will be {@code return inflater.inflate(R.layout.my_layout, container, false);}
+     * for this method will be {@code return inflater.inflate(R.layout.my_layout, container, false);}, plus
+     * any binding code.
      *
      * @param inflater The LayoutInflater that should be used to inflate views
      * @param container The parent view that this Controller's view will eventually be attached to.
@@ -116,7 +117,7 @@ public abstract class Controller {
      *                  so that valid LayoutParams can be used during inflation.
      */
     @NonNull
-    protected abstract View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
+    protected abstract View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
 
     /**
      * Returns the {@link Router} object that can be used for pushing or popping other Controllers
@@ -271,22 +272,14 @@ public abstract class Controller {
 
     /**
      * Optional target for this Controller. One reason this could be used is to send results back to the Controller
-     * that started this one. Target Controllers are retained across instances.
-     *
-     * @param target The Controller that is the target of this one.
-     */
-    public final void setTargetController(Controller target) {
-        mTargetInstanceId = target != null ? target.getInstanceId() : null;
-        onTargetControllerSet(target);
-    }
-
-    /**
-     * This method will be called when {@link #setTargetController(Controller)} is called. It is recommended
+     * that started this one. Target Controllers are retained across instances. It is recommended
      * that Controllers enforce that their target Controller conform to a specific Interface.
      *
      * @param target The Controller that is the target of this one.
      */
-    public void onTargetControllerSet(Controller target) { }
+    public void setTargetController(Controller target) {
+        mTargetInstanceId = target != null ? target.getInstanceId() : null;
+    }
 
     /**
      * Returns the target Controller that was set with the {@link #setTargetController(Controller)} method
@@ -298,20 +291,12 @@ public abstract class Controller {
     }
 
     /**
-     * Called when this Controller's View is inflated. This should overridden to bind the View
-     * to variables, either using findViewById or something like Butterknife.
-     *
-     * @param view The View to which this Controller should be bound.
-     */
-    protected void onBindView(@NonNull final View view) { }
-
-    /**
      * Called when this Controller's View is being destroyed. This should overridden to unbind the View
      * from any local variables.
      *
      * @param view The View to which this Controller should be bound.
      */
-    protected void onUnbindView(View view) { }
+    protected void onDestroyView(View view) { }
 
     /**
      * Called when this Controller begins the process of being swapped in or out of the host view.
@@ -543,7 +528,7 @@ public abstract class Controller {
         mOverriddenPopHandler = overriddenPopHandler;
     }
 
-    final void prepareForConfigurationChange() {
+    final void prepareForActivityPause() {
         mNeedsAttach = mNeedsAttach || mAttached;
     }
 
@@ -661,8 +646,6 @@ public abstract class Controller {
                 lifecycleListener.preDetach(this, view);
             }
 
-            saveViewState(view);
-
             mAttached = false;
             onDetach(view);
 
@@ -685,16 +668,20 @@ public abstract class Controller {
 
     private void removeViewReference() {
         if (mView != null) {
-            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-                lifecycleListener.preUnbindView(this, mView);
+            if (!mIsBeingDestroyed) {
+                saveViewState(mView);
             }
 
-            onUnbindView(mView);
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.preDestroyView(this, mView);
+            }
+
+            onDestroyView(mView);
 
             mView = null;
 
             for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-                lifecycleListener.postUnbindView(this);
+                lifecycleListener.postDestroyView(this);
             }
         }
 
@@ -705,13 +692,32 @@ public abstract class Controller {
 
     final View inflate(@NonNull ViewGroup parent) {
         if (mView == null) {
-            View view = inflateView(LayoutInflater.from(parent.getContext()), parent);
-            bindView(view);
-            restoreViewState(view);
-            return view;
-        } else {
-            return mView;
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.preCreateView(this);
+            }
+
+            mView = onCreateView(LayoutInflater.from(parent.getContext()), parent);
+
+            restoreViewState(mView);
+
+            mView.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    attach(v);
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    detach(v);
+                }
+            });
+
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.postCreateView(this, mView);
+            }
         }
+
+        return mView;
     }
 
     final void performDestroy() {
@@ -779,9 +785,9 @@ public abstract class Controller {
         }
     }
 
-    final Bundle saveInstanceState() {
+    final Bundle detachAndSaveInstanceState() {
         if (mAttached && mView != null) {
-            saveViewState(mView);
+            detach(mView);
         }
 
         Bundle outState = new Bundle();
@@ -802,7 +808,7 @@ public abstract class Controller {
 
         ArrayList<Bundle> childBundles = new ArrayList<>();
         for (ChildControllerTransaction childController : mChildControllers) {
-            childBundles.add(childController.toBundle());
+            childBundles.add(childController.detachAndSaveInstanceState());
         }
         outState.putParcelableArrayList(KEY_CHILDREN, childBundles);
 
@@ -856,32 +862,6 @@ public abstract class Controller {
         }
     }
 
-    private void bindView(@NonNull final View view) {
-        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-            lifecycleListener.preBindView(this, view);
-        }
-
-        mView = view;
-
-        onBindView(view);
-
-        view.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {
-                attach(view);
-            }
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                detach(view);
-            }
-        });
-
-        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-            lifecycleListener.postBindView(this, view);
-        }
-    }
-
     private void ensureRequiredConstructor() {
         Constructor[] constructors = getClass().getConstructors();
         if (getBundleConstructor(constructors) == null && getDefaultConstructor(constructors) == null) {
@@ -921,17 +901,17 @@ public abstract class Controller {
         public void onChangeStart(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) { }
         public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) { }
 
-        public void preBindView(@NonNull Controller controller, @NonNull View view) { }
-        public void postBindView(@NonNull Controller controller, @NonNull View view) { }
+        public void preCreateView(@NonNull Controller controller) { }
+        public void postCreateView(@NonNull Controller controller, @NonNull View view) { }
 
         public void preAttach(@NonNull Controller controller, @NonNull View view) { }
         public void postAttach(@NonNull Controller controller, @NonNull View view) { }
 
-        public void preUnbindView(@NonNull Controller controller, @NonNull View view) { }
-        public void postUnbindView(@NonNull Controller controller) { }
-
         public void preDetach(@NonNull Controller controller, @NonNull View view) { }
         public void postDetach(@NonNull Controller controller, @NonNull View view) { }
+
+        public void preDestroyView(@NonNull Controller controller, @NonNull View view) { }
+        public void postDestroyView(@NonNull Controller controller) { }
 
         public void preDestroy(@NonNull Controller controller) { }
         public void postDestroy(@NonNull Controller controller) { }

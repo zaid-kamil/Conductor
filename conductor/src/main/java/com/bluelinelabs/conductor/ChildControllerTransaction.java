@@ -31,8 +31,8 @@ public class ChildControllerTransaction extends ControllerTransaction {
     }
 
     @Override
-    public Bundle toBundle() {
-        Bundle bundle = super.toBundle();
+    public Bundle detachAndSaveInstanceState() {
+        Bundle bundle = super.detachAndSaveInstanceState();
         bundle.putInt(KEY_CONTAINER_ID, containerId);
         bundle.putBoolean(KEY_ADD_TO_LOCAL_BACKSTACK, addToLocalBackstack);
         return bundle;

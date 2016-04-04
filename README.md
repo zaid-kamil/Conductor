@@ -1,4 +1,4 @@
-[![Travis Build](https://travis-ci.org/bluelinelabs/Conductor.svg)](https://travis-ci.org/bluelinelabs/Conductor)
+[![Travis Build](https://travis-ci.org/bluelinelabs/Conductor.svg)](https://travis-ci.org/bluelinelabs/Conductor) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Conductor-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3361)
 
 # Conductor
 
@@ -20,14 +20,14 @@ Conductor is architecture-agnostic and does not try to force any design decision
 ## Installation
 
 ```gradle
-compile 'com.bluelinelabs:conductor:1.0.5'
+compile 'com.bluelinelabs:conductor:1.1.0'
 
 // If you want the components that go along with
 // Android's support libraries (currently just a PagerAdapter):
-compile 'com.bluelinelabs:conductor-support:1.0.5'
+compile 'com.bluelinelabs:conductor-support:1.1.0'
 
 // If you want RxJava/RxAndroid lifecycle support:
-compile 'com.bluelinelabs:conductor-rxlifecycle:1.0.5'
+compile 'com.bluelinelabs:conductor-rxlifecycle:1.1.0'
 ```
 
 ## Components to Know

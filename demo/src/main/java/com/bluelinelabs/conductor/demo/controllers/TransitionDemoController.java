@@ -80,8 +80,8 @@ public class TransitionDemoController extends RefWatchingController {
     }
 
     @Override
-    protected void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    protected void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
 
         View bgView = ButterKnife.findById(view, R.id.bg_view);
         if (mTransitionDemo.colorId != 0 && bgView != null) {

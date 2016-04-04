@@ -21,8 +21,8 @@ public class ControllerLifecycleSubjectHelper {
 
         controller.addLifecycleListener(new LifecycleListener() {
             @Override
-            public void preBindView(@NonNull Controller controller, @NonNull View view) {
-                subject.onNext(ControllerEvent.BIND_VIEW);
+            public void preCreateView(@NonNull Controller controller) {
+                subject.onNext(ControllerEvent.CREATE_VIEW);
             }
 
             @Override
@@ -31,13 +31,13 @@ public class ControllerLifecycleSubjectHelper {
             }
 
             @Override
-            public void preUnbindView(@NonNull Controller controller, @NonNull View view) {
-                subject.onNext(ControllerEvent.UNBIND_VIEW);
+            public void preDetach(@NonNull Controller controller, @NonNull View view) {
+                subject.onNext(ControllerEvent.DETACH);
             }
 
             @Override
-            public void preDetach(@NonNull Controller controller, @NonNull View view) {
-                subject.onNext(ControllerEvent.DETACH);
+            public void preDestroyView(@NonNull Controller controller, @NonNull View view) {
+                subject.onNext(ControllerEvent.DESTROY_VIEW);
             }
 
             @Override

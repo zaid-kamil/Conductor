@@ -33,8 +33,8 @@ public class RxControllerLifecycle {
                             return ControllerEvent.DESTROY;
                         case ATTACH:
                             return ControllerEvent.DETACH;
-                        case BIND_VIEW:
-                            return ControllerEvent.UNBIND_VIEW;
+                        case CREATE_VIEW:
+                            return ControllerEvent.DESTROY_VIEW;
                         case DETACH:
                             return ControllerEvent.DESTROY;
                         default:

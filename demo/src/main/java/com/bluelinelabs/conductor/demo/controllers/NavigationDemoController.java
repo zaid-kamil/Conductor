@@ -45,8 +45,8 @@ public class NavigationDemoController extends RefWatchingController {
     }
 
     @Override
-    protected void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    protected void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
 
         view.setBackgroundColor(ColorUtil.getMaterialColor(getResources(), mIndex));
         mTvTitle.setText(getResources().getString(R.string.navigation_title, mIndex));

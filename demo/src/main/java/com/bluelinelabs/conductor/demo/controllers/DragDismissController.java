@@ -36,9 +36,7 @@ public class DragDismissController extends RefWatchingController {
     }
 
     @Override
-    protected void onBindView(@NonNull View view) {
-        super.onBindView(view);
-
+    protected void onViewBound(@NonNull View view) {
         ((ElasticDragDismissFrameLayout)view).addListener(mDragDismissListener);
 
         mTvLoremIpsum.setText("Lorem ipsum dolor sit amet, volutpat lacus egestas integer vitae, tempus potenti posuere dolore, elit cras ut vulputate pede eros. Pharetra curabitur, cum ultrices nisi nulla, non a est diamlorem in pede. Feugiat vivamus id, leo massa, pede ligula libero wisi, posuere nec interdum risus. Mauris eros. Scelerisque etiam dignissim, sem odio magna posuere libero in. Eget non posuere, rutrum nunc ut, ipsum ornare, vestibulum nisl turpis, urna interdum. Arcu mi velit. Sem dolor amet sed hymenaeos tempor. Cras felis.\n" +
@@ -48,9 +46,10 @@ public class DragDismissController extends RefWatchingController {
     }
 
     @Override
-    protected void onUnbindView(View view) {
-        super.onUnbindView(view);
+    protected void onDestroyView(View view) {
+        super.onDestroyView(view);
 
         ((ElasticDragDismissFrameLayout)view).removeListener(mDragDismissListener);
     }
+
 }

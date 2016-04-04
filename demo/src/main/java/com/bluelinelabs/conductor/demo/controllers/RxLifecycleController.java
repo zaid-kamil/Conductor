@@ -48,10 +48,8 @@ public class RxLifecycleController extends RefWatchingController {
     }
 
     @Override
-    public void onBindView(@NonNull View view) {
-        super.onBindView(view);
-
-        Log.i(TAG, "onBindView() called");
+    public void onViewBound(@NonNull View view) {
+        Log.i(TAG, "onCreateView() called");
 
         mTvTitle.setText(getResources().getString(R.string.rxlifecycle_title, TAG));
 
@@ -59,14 +57,14 @@ public class RxLifecycleController extends RefWatchingController {
                 .doOnUnsubscribe(new Action0() {
                     @Override
                     public void call() {
-                        Log.i(TAG, "Unsubscribing from onBindView()");
+                        Log.i(TAG, "Unsubscribing from onCreateView)");
                     }
                 })
-                .compose(this.<Long>bindUntilEvent(ControllerEvent.UNBIND_VIEW))
+                .compose(this.<Long>bindUntilEvent(ControllerEvent.DESTROY_VIEW))
                 .subscribe(new Action1<Long>() {
                     @Override
                     public void call(Long num) {
-                        Log.i(TAG, "Started in onBindView(), running until onUnbindView(): " + num);
+                        Log.i(TAG, "Started in onCreateView(), running until onDestroyView(): " + num);
                     }
                 });
     }
@@ -94,10 +92,10 @@ public class RxLifecycleController extends RefWatchingController {
     }
 
     @Override
-    protected void onUnbindView(View view) {
-        super.onUnbindView(view);
+    protected void onDestroyView(View view) {
+        super.onDestroyView(view);
 
-        Log.i(TAG, "onUnbindView() called");
+        Log.i(TAG, "onDestroyView() called");
     }
 
     @Override
@@ -123,7 +121,7 @@ public class RxLifecycleController extends RefWatchingController {
     @OnClick(R.id.btn_next_release_view) void onNextWithReleaseClicked() {
         setRetainViewMode(RetainViewMode.RELEASE_DETACH);
 
-        getRouter().pushController(RouterTransaction.builder(new TextController("Logcat should now report that the observables from onAttach() and onBindView() have been unsubscribed from, while the constructor observable is still running."))
+        getRouter().pushController(RouterTransaction.builder(new TextController("Logcat should now report that the observables from onAttach() and onViewBound() have been unsubscribed from, while the constructor observable is still running."))
                 .pushChangeHandler(new HorizontalChangeHandler())
                 .popChangeHandler(new HorizontalChangeHandler())
                 .build()
@@ -133,7 +131,7 @@ public class RxLifecycleController extends RefWatchingController {
     @OnClick(R.id.btn_next_retain_view) void onNextWithRetainClicked() {
         setRetainViewMode(RetainViewMode.RETAIN_DETACH);
 
-        getRouter().pushController(RouterTransaction.builder(new TextController("Logcat should now report that the observables from onAttach() has been unsubscribed from, while the constructor and onBindView() observables are still running."))
+        getRouter().pushController(RouterTransaction.builder(new TextController("Logcat should now report that the observables from onAttach() has been unsubscribed from, while the constructor and onViewBound() observables are still running."))
                 .pushChangeHandler(new HorizontalChangeHandler())
                 .popChangeHandler(new HorizontalChangeHandler())
                 .build()

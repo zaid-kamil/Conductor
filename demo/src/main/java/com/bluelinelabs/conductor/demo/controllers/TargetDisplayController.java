@@ -70,8 +70,8 @@ public class TargetDisplayController extends RefWatchingController implements Ta
     }
 
     @Override
-    protected void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    protected void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
         setTextView();
         setImageView();
     }

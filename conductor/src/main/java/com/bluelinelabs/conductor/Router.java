@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Controller.LifecycleListener;
@@ -237,7 +238,20 @@ public class Router {
      * @param changeHandler The {@link ControllerChangeHandler} to use for setting the root
      */
     public void setRoot(@NonNull Controller controller, String tag, ControllerChangeHandler changeHandler) {
-        mContainer.removeAllViews();
+        RouterTransaction currentTop = mBackStack.peek();
+
+        if (currentTop != null && currentTop.controller.getView() != null) {
+            final View fromView = currentTop.controller.getView();
+
+            final int childCount = mContainer.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                final View child = mContainer.getChildAt(i);
+                if (child != fromView) {
+                    mContainer.removeView(child);
+                }
+            }
+        }
+
         trackDestroyingControllers(mBackStack.popAll());
 
         RouterTransaction transaction = RouterTransaction.builder(controller)
@@ -247,7 +261,7 @@ public class Router {
                 .build();
 
         pushToBackstack(transaction);
-        performControllerChange(transaction, null, true);
+        performControllerChange(transaction, currentTop, true);
     }
 
     /**
@@ -358,13 +372,11 @@ public class Router {
     }
 
     public final void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-        if (activity.isChangingConfigurations()) {
-            for (RouterTransaction transaction : mBackStack) {
-                transaction.controller.prepareForConfigurationChange();
-            }
+        for (RouterTransaction transaction : mBackStack) {
+            transaction.controller.prepareForActivityPause();
         }
 
-        mBackStack.saveInstanceState(outState);
+        mBackStack.detachAndSaveInstanceState(outState);
     }
 
     public final void onActivityDestroyed(Activity activity) {
@@ -466,14 +478,16 @@ public class Router {
     }
 
     private void trackDestroyingController(RouterTransaction transaction) {
-        mDestroyingControllers.add(transaction.controller);
+        if (!transaction.controller.isDestroyed()) {
+            mDestroyingControllers.add(transaction.controller);
 
-        transaction.controller.addLifecycleListener(new LifecycleListener() {
-            @Override
-            public void postDestroy(@NonNull Controller controller) {
-                mDestroyingControllers.remove(controller);
-            }
-        });
+            transaction.controller.addLifecycleListener(new LifecycleListener() {
+                @Override
+                public void postDestroy(@NonNull Controller controller) {
+                    mDestroyingControllers.remove(controller);
+                }
+            });
+        }
     }
 
     private void trackDestroyingControllers(List<RouterTransaction> transactions) {

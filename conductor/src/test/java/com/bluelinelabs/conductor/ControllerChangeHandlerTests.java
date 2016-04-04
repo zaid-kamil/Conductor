@@ -17,7 +17,7 @@ public class ControllerChangeHandlerTests {
                 .pushChangeHandler(horizontalChangeHandler)
                 .popChangeHandler(fadeChangeHandler)
                 .build();
-        RouterTransaction restoredTransaction = new RouterTransaction(transaction.toBundle());
+        RouterTransaction restoredTransaction = new RouterTransaction(transaction.detachAndSaveInstanceState());
 
         ControllerChangeHandler restoredHorizontal = restoredTransaction.getPushControllerChangeHandler();
         ControllerChangeHandler restoredFade = restoredTransaction.getPopControllerChangeHandler();

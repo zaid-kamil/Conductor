@@ -37,8 +37,8 @@ public class TextController extends RefWatchingController {
     }
 
     @Override
-    public void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    public void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
         mTextView.setText(getArgs().getString(KEY_TEXT));
     }
 

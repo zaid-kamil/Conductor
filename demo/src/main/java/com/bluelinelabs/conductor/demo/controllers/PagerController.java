@@ -42,8 +42,8 @@ public class PagerController extends RefWatchingController {
     }
 
     @Override
-    protected void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    protected void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
         mViewPager.setAdapter(mPagerAdapter);
     }
 

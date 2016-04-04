@@ -15,7 +15,7 @@ public class TestController extends Controller {
 
     @NonNull
     @Override
-    protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+    protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         View view = new FrameLayout(inflater.getContext());
         view.setId(VIEW_ID);
         return view;

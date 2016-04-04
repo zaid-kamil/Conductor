@@ -22,8 +22,8 @@ public class OverlayController extends RefWatchingController {
     }
 
     @Override
-    public void onBindView(@NonNull View view) {
-        super.onBindView(view);
+    public void onViewBound(@NonNull View view) {
+        super.onViewBound(view);
         mTextView.setText("I'm an Overlay");
     }
 

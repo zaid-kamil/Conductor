@@ -29,9 +29,9 @@ public class ControllerTests {
 
     private int mChangeStartCalls;
     private int mChangeEndCalls;
-    private int mBindViewCalls;
+    private int mCreateViewCalls;
     private int mAttachCalls;
-    private int mUnbindViewCalls;
+    private int mDestroyViewCalls;
     private int mDetachCalls;
     private int mDestroyCalls;
 
@@ -44,9 +44,9 @@ public class ControllerTests {
 
         mChangeStartCalls = 0;
         mChangeEndCalls = 0;
-        mBindViewCalls = 0;
+        mCreateViewCalls = 0;
         mAttachCalls = 0;
-        mUnbindViewCalls = 0;
+        mDestroyViewCalls = 0;
         mDestroyCalls = 0;
         mDestroyCalls = 0;
     }
@@ -228,9 +228,9 @@ public class ControllerTests {
     private void assertCalls(int changeStart, int changeEnd, int bindView, int attach, int unbindView, int detach, int destroy) {
         Assert.assertEquals(changeStart, mChangeStartCalls);
         Assert.assertEquals(changeEnd, mChangeEndCalls);
-        Assert.assertEquals(bindView, mBindViewCalls);
+        Assert.assertEquals(bindView, mCreateViewCalls);
         Assert.assertEquals(attach, mAttachCalls);
-        Assert.assertEquals(unbindView, mUnbindViewCalls);
+        Assert.assertEquals(unbindView, mDestroyViewCalls);
         Assert.assertEquals(detach, mDetachCalls);
         Assert.assertEquals(destroy, mDestroyCalls);
     }
@@ -248,8 +248,8 @@ public class ControllerTests {
             }
 
             @Override
-            public void postBindView(@NonNull Controller controller, @NonNull View view) {
-                mBindViewCalls++;
+            public void postCreateView(@NonNull Controller controller, @NonNull View view) {
+                mCreateViewCalls++;
             }
 
             @Override
@@ -258,8 +258,8 @@ public class ControllerTests {
             }
 
             @Override
-            public void postUnbindView(@NonNull Controller controller) {
-                mUnbindViewCalls++;
+            public void postDestroyView(@NonNull Controller controller) {
+                mDestroyViewCalls++;
             }
 
             @Override

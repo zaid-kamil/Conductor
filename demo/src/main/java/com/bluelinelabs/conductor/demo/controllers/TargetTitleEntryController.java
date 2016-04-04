@@ -21,25 +21,21 @@ public class TargetTitleEntryController extends RefWatchingController {
 
     @Bind(R.id.edit_text) EditText mEditText;
 
+    public <T extends Controller & TargetTitleEntryControllerListener> TargetTitleEntryController(T targetController) {
+        super.setTargetController(targetController);
+    }
+
     public TargetTitleEntryController() { }
 
-    public TargetTitleEntryController(Controller targetController) {
-        setTargetController(targetController);
+    @Override
+    public void setTargetController(Controller target) {
+        throw new RuntimeException(getClass().getSimpleName() + "s can only have their target set through the constructor.");
     }
 
     @NonNull
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
         return inflater.inflate(R.layout.controller_target_title_entry, container, false);
-    }
-
-    @Override
-    public void onTargetControllerSet(Controller target) {
-        super.onTargetControllerSet(target);
-
-        if (!(target instanceof TargetTitleEntryControllerListener)) {
-            throw new RuntimeException(getClass().getSimpleName() + " target Controllers must implement the " + TargetTitleEntryControllerListener.class.getSimpleName() + " interface.");
-        }
     }
 
     @OnClick(R.id.btn_use_title) void optionPicked() {
