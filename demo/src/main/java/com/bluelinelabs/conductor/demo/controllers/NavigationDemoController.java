@@ -9,15 +9,15 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
-import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.util.ColorUtil;
 
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class NavigationDemoController extends RefWatchingController {
+public class NavigationDemoController extends BaseController {
 
     public static final String TAG_UP_TRANSACTION = "NavigationDemoController.up";
 
@@ -50,6 +50,11 @@ public class NavigationDemoController extends RefWatchingController {
 
         view.setBackgroundColor(ColorUtil.getMaterialColor(getResources(), mIndex));
         mTvTitle.setText(getResources().getString(R.string.navigation_title, mIndex));
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Navigation Demos";
     }
 
     @OnClick(R.id.btn_next) void onNextClicked() {

@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -397,6 +400,33 @@ public class Router {
 
     public final void onRestoreInstanceState(Bundle savedInstanceState) {
         mBackStack.restoreInstanceState(savedInstanceState);
+    }
+
+    public final void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        for (RouterTransaction transaction : mBackStack) {
+            transaction.controller.createOptionsMenu(menu, inflater);
+        }
+    }
+
+    public final void onPrepareOptionsMenu(Menu menu) {
+        for (RouterTransaction transaction : mBackStack) {
+            transaction.controller.prepareOptionsMenu(menu);
+        }
+    }
+
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        for (RouterTransaction transaction : mBackStack) {
+            if (transaction.controller.optionsItemSelected(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    final void invalidateOptionsMenu() {
+        if (mLifecycleHandler != null) {
+            mLifecycleHandler.getFragmentManager().invalidateOptionsMenu();
+        }
     }
 
     private void popToTransaction(@NonNull RouterTransaction transaction, ControllerChangeHandler changeHandler) {

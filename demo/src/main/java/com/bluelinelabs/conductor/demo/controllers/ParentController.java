@@ -11,10 +11,10 @@ import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerTransaction.ControllerChangeType;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 import com.bluelinelabs.conductor.demo.util.ColorUtil;
 
-public class ParentController extends RefWatchingController {
+public class ParentController extends BaseController {
 
     private static final int NUMBER_OF_CHILDREN = 5;
     private boolean mFinishing;
@@ -60,6 +60,11 @@ public class ParentController extends RefWatchingController {
             removeChild(getChildControllers().size() - 1);
         }
         return true;
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Parent/Child Demo";
     }
 
     @Override

@@ -10,14 +10,14 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.changehandler.ScaleFadeChangeHandler;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 import com.bluelinelabs.conductor.demo.widget.ElasticDragDismissFrameLayout;
 import com.bluelinelabs.conductor.demo.widget.ElasticDragDismissFrameLayout.ElasticDragDismissCallback;
 
 import butterknife.Bind;
 
 @TargetApi(VERSION_CODES.LOLLIPOP)
-public class DragDismissController extends RefWatchingController {
+public class DragDismissController extends BaseController {
 
     @Bind(R.id.tv_lorem_ipsum) TextView mTvLoremIpsum;
 
@@ -52,4 +52,8 @@ public class DragDismissController extends RefWatchingController {
         ((ElasticDragDismissFrameLayout)view).removeListener(mDragDismissListener);
     }
 
+    @Override
+    protected String getTitle() {
+        return "Drag to Dismiss";
+    }
 }

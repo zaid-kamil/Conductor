@@ -13,16 +13,24 @@ public class ControllerTransaction {
      */
     public enum ControllerChangeType {
         /** The Controller is being pushed to the host container */
-        PUSH_ENTER,
+        PUSH_ENTER(true, true),
 
         /** The Controller is being pushed to the backstack as another Controller is pushed to the host container */
-        PUSH_EXIT,
+        PUSH_EXIT(true, false),
 
         /** The Controller is being popped from the backstack and placed in the host container as another Controller is popped */
-        POP_ENTER,
+        POP_ENTER(false, true),
 
-        /** The Controller is being popped from the host contianer */
-        POP_EXIT
+        /** The Controller is being popped from the host container */
+        POP_EXIT(false, false);
+
+        public boolean isPush;
+        public boolean isEnter;
+
+        ControllerChangeType(boolean isPush, boolean isEnter) {
+            this.isPush = isPush;
+            this.isEnter = isEnter;
+        }
     }
 
     private static final String KEY_VIEW_CONTROLLER_BUNDLE = "ControllerTransaction.controller.bundle";

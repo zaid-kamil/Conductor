@@ -19,17 +19,17 @@ import com.bluelinelabs.conductor.changehandler.CircularRevealChangeHandler;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler;
-import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.changehandler.ArcFadeMoveChangeHandlerCompat;
 import com.bluelinelabs.conductor.demo.changehandler.FlipChangeHandler;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TransitionDemoController extends RefWatchingController {
+public class TransitionDemoController extends BaseController {
 
     private static final String KEY_INDEX = "TransitionDemoController.index";
 
@@ -99,6 +99,11 @@ public class TransitionDemoController extends RefWatchingController {
 
         mBtnNext.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getActivity(), buttonColor)));
         mTvTitle.setText(mTransitionDemo.title);
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Transition Demos";
     }
 
     @OnClick(R.id.btn_next) void onNextClicked() {

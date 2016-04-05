@@ -2,7 +2,6 @@ package com.bluelinelabs.conductor;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -71,7 +70,7 @@ public abstract class ControllerChangeHandler {
         }
     }
 
-    public static ControllerChangeHandler fromBundle(@Nullable Bundle bundle) {
+    public static ControllerChangeHandler fromBundle(Bundle bundle) {
         if (bundle != null) {
             String className = bundle.getString(KEY_CLASS_NAME);
             ControllerChangeHandler changeHandler = ClassUtils.newInstance(className);

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 import com.bluelinelabs.conductor.rxlifecycle.ControllerEvent;
 
 import java.util.concurrent.TimeUnit;
@@ -23,7 +23,7 @@ import rx.functions.Action1;
 
 // Shamelessly borrowed from the official RxLifecycle demo by Trello and adapted for Conductor Controllers
 // instead of Activities or Fragments.
-public class RxLifecycleController extends RefWatchingController {
+public class RxLifecycleController extends BaseController {
 
     private static final String TAG = "RxLifecycleController";
 
@@ -110,6 +110,11 @@ public class RxLifecycleController extends RefWatchingController {
         super.onDestroy();
 
         Log.i(TAG, "onDestroy() called");
+    }
+
+    @Override
+    protected String getTitle() {
+        return "RxLifecycle Demo";
     }
 
     @NonNull

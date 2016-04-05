@@ -10,11 +10,11 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 
 import butterknife.Bind;
 
-public class ChildController extends RefWatchingController {
+public class ChildController extends BaseController {
 
     private static final String KEY_TITLE = "ChildController.title";
     private static final String KEY_BG_COLOR = "ChildController.bgColor";

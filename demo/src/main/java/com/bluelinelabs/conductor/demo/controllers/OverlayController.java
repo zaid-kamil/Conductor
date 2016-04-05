@@ -1,19 +1,34 @@
 package com.bluelinelabs.conductor.demo.controllers;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
+import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 
 import butterknife.Bind;
 
-public class OverlayController extends RefWatchingController {
+public class OverlayController extends BaseController {
+
+    private static final String KEY_TEXT = "OverlayController.text";
 
     @Bind(R.id.text_view) TextView mTextView;
+
+    public OverlayController(CharSequence text) {
+        this(new BundleBuilder(new Bundle())
+                .putCharSequence(KEY_TEXT, text)
+                .build());
+    }
+
+    public OverlayController(Bundle args) {
+        super(args);
+    }
 
     @NonNull
     @Override
@@ -24,7 +39,8 @@ public class OverlayController extends RefWatchingController {
     @Override
     public void onViewBound(@NonNull View view) {
         super.onViewBound(view);
-        mTextView.setText("I'm an Overlay");
+        mTextView.setText(getArgs().getCharSequence(KEY_TEXT));
+        mTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
 }

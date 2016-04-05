@@ -17,12 +17,12 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 import com.bluelinelabs.conductor.demo.R;
 import com.bluelinelabs.conductor.demo.controllers.TargetTitleEntryController.TargetTitleEntryControllerListener;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class TargetDisplayController extends RefWatchingController implements TargetTitleEntryControllerListener {
+public class TargetDisplayController extends BaseController implements TargetTitleEntryControllerListener {
 
     private static final int REQUEST_SELECT_IMAGE = 126;
 
@@ -92,6 +92,11 @@ public class TargetDisplayController extends RefWatchingController implements Ta
         if (!TextUtils.isEmpty(uriString)) {
             mImageUri = Uri.parse(uriString);
         }
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Target Controller Demo";
     }
 
     private void setImageView() {

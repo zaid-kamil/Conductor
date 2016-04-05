@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.demo.util.BundleBuilder;
 import com.bluelinelabs.conductor.demo.R;
-import com.bluelinelabs.conductor.demo.controllers.base.RefWatchingController;
+import com.bluelinelabs.conductor.demo.controllers.base.BaseController;
 
 import butterknife.Bind;
 
-public class TextController extends RefWatchingController {
+public class TextController extends BaseController {
 
     private static final String KEY_TEXT = "TextController.text";
 

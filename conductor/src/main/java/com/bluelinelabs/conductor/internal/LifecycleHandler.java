@@ -9,6 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Router;
@@ -33,6 +36,7 @@ public class LifecycleHandler extends Fragment implements ActivityLifecycleCallb
 
     public LifecycleHandler() {
         setRetainInstance(true);
+        setHasOptionsMenu(true);
     }
 
     private static LifecycleHandler findInActivity(Activity activity) {
@@ -153,6 +157,35 @@ public class LifecycleHandler extends Fragment implements ActivityLifecycleCallb
             }
         }
         return super.shouldShowRequestPermissionRationale(permission);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        for (Router router : mRouterMap.values()) {
+            router.onCreateOptionsMenu(menu, inflater);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        for (Router router : mRouterMap.values()) {
+            router.onPrepareOptionsMenu(menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        for (Router router : mRouterMap.values()) {
+            if (router.onOptionsItemSelected(item)) {
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void startActivityForResult(String instanceId, Intent intent, int requestCode) {
