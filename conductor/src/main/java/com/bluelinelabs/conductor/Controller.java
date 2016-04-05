@@ -53,6 +53,7 @@ public abstract class Controller {
     private boolean mIsBeingDestroyed;
     private boolean mDestroyed;
     private boolean mAttached;
+    private boolean mViewIsAttached;
     private Router mRouter;
     private View mView;
     private Controller mParentController;
@@ -590,6 +591,10 @@ public abstract class Controller {
     }
 
     final void activityResumed(Activity activity) {
+        if (!mAttached && mView != null && mViewIsAttached) {
+            attach(mView);
+        }
+
         onActivityResumed(activity);
 
         for (ChildControllerTransaction child : mChildControllers) {
@@ -644,7 +649,9 @@ public abstract class Controller {
         }
     }
 
-    private void detach(@NonNull View view) {
+    private void detach(@NonNull View view, boolean allowViewRefRemoval) {
+        final boolean removeViewRef = allowViewRefRemoval && (mRetainViewMode == RetainViewMode.RELEASE_DETACH || mIsBeingDestroyed);
+
         if (mAttached) {
             for (LifecycleListener lifecycleListener : mLifecycleListeners) {
                 lifecycleListener.preDetach(this, view);
@@ -660,13 +667,15 @@ public abstract class Controller {
                 }
             }
 
-            if (mRetainViewMode == RetainViewMode.RELEASE_DETACH || mIsBeingDestroyed) {
+            if (removeViewRef) {
                 removeViewReference();
             }
 
             for (LifecycleListener lifecycleListener : mLifecycleListeners) {
                 lifecycleListener.postDetach(this, view);
             }
+        } else if (removeViewRef) {
+            removeViewReference();
         }
     }
 
@@ -707,12 +716,16 @@ public abstract class Controller {
             mView.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
                 @Override
                 public void onViewAttachedToWindow(View v) {
+                    if (v == mView) {
+                        mViewIsAttached = true;
+                    }
                     attach(v);
                 }
 
                 @Override
                 public void onViewDetachedFromWindow(View v) {
-                    detach(v);
+                    mViewIsAttached = false;
+                    detach(v, true);
                 }
             });
 
@@ -754,7 +767,7 @@ public abstract class Controller {
         if (!mAttached) {
             removeViewReference();
         } else if (removeViews) {
-            detach(mView);
+            detach(mView, true);
         }
     }
 
@@ -791,7 +804,7 @@ public abstract class Controller {
 
     final Bundle detachAndSaveInstanceState() {
         if (mAttached && mView != null) {
-            detach(mView);
+            detach(mView, mIsBeingDestroyed);
         }
 
         Bundle outState = new Bundle();

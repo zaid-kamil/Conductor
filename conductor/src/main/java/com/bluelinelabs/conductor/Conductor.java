@@ -12,7 +12,7 @@ import com.bluelinelabs.conductor.internal.LifecycleHandler;
  */
 public final class Conductor {
     
-    private Conductor(){}
+    private Conductor() {}
     
     /**
      * Conductor will create a {@link Router} that has been initialized for your Activity and containing ViewGroup.
