@@ -8,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bluelinelabs.conductor.changehandler.CircularRevealChangeHandler;
-
 public class CircularRevealChangeHandlerCompat extends CircularRevealChangeHandler {
 
     public CircularRevealChangeHandlerCompat() { }
