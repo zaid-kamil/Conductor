@@ -1,4 +1,4 @@
-package com.bluelinelabs.conductor.changehandler;
+package com.bluelinelabs.conductor.demo.changehandler;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+
+import com.bluelinelabs.conductor.changehandler.AnimatorChangeHandler;
 
 /**
  * An {@link AnimatorChangeHandler} that will perform a circular reveal

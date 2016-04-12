@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.bluelinelabs.conductor.ControllerTransaction.ControllerChangeType;
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler;
 import com.bluelinelabs.conductor.internal.ClassUtils;
+import com.bluelinelabs.conductor.internal.RouterRequiringFunc;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -71,6 +72,7 @@ public abstract class Controller {
     private final List<ChildControllerTransaction> mChildControllers = new ArrayList<>();
     private final List<LifecycleListener> mLifecycleListeners = new ArrayList<>();
     private final ArrayList<String> mRequestedPermissions = new ArrayList<>();
+    private final ArrayList<RouterRequiringFunc> mOnRouterSetListeners = new ArrayList<>();
 
     static Controller newInstance(Bundle bundle) {
         final String className = bundle.getString(KEY_CLASS_NAME);
@@ -400,22 +402,40 @@ public abstract class Controller {
     /**
      * Calls startActivity(Intent) from this Controller's host Activity.
      */
-    public final void startActivity(Intent intent) {
-        getRouter().getLifecycleHandler().startActivity(intent);
+    public final void startActivity(final Intent intent) {
+        executeWithRouter(new RouterRequiringFunc() {
+            @Override public void execute() { mRouter.getLifecycleHandler().startActivity(intent); }
+        });
     }
 
     /**
      * Calls startActivityForResult(Intent, int) from this Controller's host Activity.
      */
-    public final void startActivityForResult(Intent intent, int requestCode) {
-        getRouter().getLifecycleHandler().startActivityForResult(mInstanceId, intent, requestCode);
+    public final void startActivityForResult(final Intent intent, final int requestCode) {
+        executeWithRouter(new RouterRequiringFunc() {
+            @Override public void execute() { mRouter.getLifecycleHandler().startActivityForResult(mInstanceId, intent, requestCode); }
+        });
     }
 
     /**
      * Calls startActivityForResult(Intent, int, Bundle) from this Controller's host Activity.
      */
-    public final void startActivityForResult(Intent intent, int requestCode, Bundle options) {
-        getRouter().getLifecycleHandler().startActivityForResult(mInstanceId, intent, requestCode, options);
+    public final void startActivityForResult(final Intent intent, final int requestCode, final Bundle options) {
+        executeWithRouter(new RouterRequiringFunc() {
+            @Override public void execute() { mRouter.getLifecycleHandler().startActivityForResult(mInstanceId, intent, requestCode, options); }
+        });
+    }
+
+    /**
+     * Registers this Controller to handle onActivityResult responses. Calling this method is NOT
+     * necessary when calling {@link #startActivityForResult(Intent, int)}
+     *
+     * @param requestCode The request code being registered for.
+     */
+    public final void registerForActivityResult(final int requestCode) {
+        executeWithRouter(new RouterRequiringFunc() {
+            @Override public void execute() { mRouter.getLifecycleHandler().registerForActivityRequest(mInstanceId, requestCode); }
+        });
     }
 
     /**
@@ -434,9 +454,12 @@ public abstract class Controller {
      * {@link #onRequestPermissionsResult(int, String[], int[])} will be forwarded back to this Controller by the system.
      */
     @TargetApi(Build.VERSION_CODES.M)
-    public final void requestPermissions(@NonNull String[] permissions, int requestCode) {
+    public final void requestPermissions(@NonNull final String[] permissions, final int requestCode) {
         mRequestedPermissions.addAll(Arrays.asList(permissions));
-        getRouter().getLifecycleHandler().requestPermissions(mInstanceId, permissions, requestCode);
+
+        executeWithRouter(new RouterRequiringFunc() {
+            @Override public void execute() { mRouter.getLifecycleHandler().requestPermissions(mInstanceId, permissions, requestCode); }
+        });
     }
 
     /**
@@ -625,8 +648,21 @@ public abstract class Controller {
     final void setRouter(@NonNull Router router) {
         mRouter = router;
 
+        for (RouterRequiringFunc listener : mOnRouterSetListeners) {
+            listener.execute();
+        }
+        mOnRouterSetListeners.clear();
+
         for (ChildControllerTransaction child : mChildControllers) {
             child.controller.setRouter(router);
+        }
+    }
+
+    final void executeWithRouter(@NonNull RouterRequiringFunc listener) {
+        if (mRouter != null) {
+            listener.execute();
+        } else {
+            mOnRouterSetListeners.add(listener);
         }
     }
 
@@ -824,6 +860,10 @@ public abstract class Controller {
             }
 
             mDestroyed = true;
+
+            if (mRouter != null) {
+                mRouter.getLifecycleHandler().unregisterForActivityRequests(mInstanceId);
+            }
 
             onDestroy();
 

@@ -188,13 +188,25 @@ public class LifecycleHandler extends Fragment implements ActivityLifecycleCallb
         return super.onOptionsItemSelected(item);
     }
 
-    public void startActivityForResult(String instanceId, Intent intent, int requestCode) {
+    public void registerForActivityRequest(String instanceId, int requestCode) {
         mActivityRequestMap.put(requestCode, instanceId);
+    }
+
+    public void unregisterForActivityRequests(String instanceId) {
+        for (int i = mActivityRequestMap.size() - 1; i >= 0; i--) {
+            if (instanceId.equals(mActivityRequestMap.get(mActivityRequestMap.keyAt(i)))) {
+                mActivityRequestMap.removeAt(i);
+            }
+        }
+    }
+
+    public void startActivityForResult(String instanceId, Intent intent, int requestCode) {
+        registerForActivityRequest(instanceId, requestCode);
         startActivityForResult(intent, requestCode);
     }
 
     public void startActivityForResult(String instanceId, Intent intent, int requestCode, Bundle options) {
-        mActivityRequestMap.put(requestCode, instanceId);
+        registerForActivityRequest(instanceId, requestCode);
         startActivityForResult(intent, requestCode, options);
     }
 

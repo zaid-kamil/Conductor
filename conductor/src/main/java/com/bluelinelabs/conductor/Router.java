@@ -41,19 +41,15 @@ public class Router {
     }
 
     /**
-     * This should be called by the host Activity when its onActivityResult method is called. The call will be forwarded
-     * to the {@link Controller} with the instanceId passed in.
+     * This should be called by the host Activity when its onActivityResult method is called if the instanceId
+     * of the controller that called startActivityForResult is not known.
      *
-     * @param instanceId The instanceId of the Controller to which this result should be forwarded
      * @param requestCode The Activity's onActivityResult requestCode
      * @param resultCode The Activity's onActivityResult resultCode
      * @param data The Activity's onActivityResult data
      */
-    public void onActivityResult(String instanceId, int requestCode, int resultCode, Intent data) {
-        Controller controller = getControllerWithInstanceId(instanceId);
-        if (controller != null) {
-            controller.onActivityResult(requestCode, resultCode, data);
-        }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        getLifecycleHandler().onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -347,6 +343,13 @@ public class Router {
             if (transaction.controller.getNeedsAttach()) {
                 performControllerChange(transaction.controller, null, true, new SimpleSwapChangeHandler(false));
             }
+        }
+    }
+
+    public final void onActivityResult(String instanceId, int requestCode, int resultCode, Intent data) {
+        Controller controller = getControllerWithInstanceId(instanceId);
+        if (controller != null) {
+            controller.onActivityResult(requestCode, resultCode, data);
         }
     }
 
