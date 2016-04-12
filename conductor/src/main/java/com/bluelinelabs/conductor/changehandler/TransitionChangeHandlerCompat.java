@@ -50,8 +50,8 @@ public class TransitionChangeHandlerCompat extends ControllerChangeHandler {
     public void saveToBundle(@NonNull Bundle bundle) {
         super.saveToBundle(bundle);
 
-        bundle.putString(KEY_TRANSITION_HANDLER_CLASS, mTransitionChangeHandler.getClass().getCanonicalName());
-        bundle.putString(KEY_FALLBACK_HANDLER_CLASS, mFallbackChangeHandler.getClass().getCanonicalName());
+        bundle.putString(KEY_TRANSITION_HANDLER_CLASS, mTransitionChangeHandler.getClass().getName());
+        bundle.putString(KEY_FALLBACK_HANDLER_CLASS, mFallbackChangeHandler.getClass().getName());
 
         Bundle transitionBundle = new Bundle();
         mTransitionChangeHandler.saveToBundle(transitionBundle);

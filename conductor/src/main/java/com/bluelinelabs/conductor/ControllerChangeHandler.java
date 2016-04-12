@@ -53,7 +53,7 @@ public abstract class ControllerChangeHandler {
 
     final Bundle toBundle() {
         Bundle bundle = new Bundle();
-        bundle.putString(KEY_CLASS_NAME, getClass().getCanonicalName());
+        bundle.putString(KEY_CLASS_NAME, getClass().getName());
 
         Bundle savedState = new Bundle();
         saveToBundle(savedState);

@@ -928,7 +928,7 @@ public abstract class Controller {
         }
 
         Bundle outState = new Bundle();
-        outState.putString(KEY_CLASS_NAME, getClass().getCanonicalName());
+        outState.putString(KEY_CLASS_NAME, getClass().getName());
         outState.putBundle(KEY_VIEW_STATE, mViewState);
         outState.putBundle(KEY_ARGS, mArgs);
         outState.putString(KEY_INSTANCE_ID, mInstanceId);
