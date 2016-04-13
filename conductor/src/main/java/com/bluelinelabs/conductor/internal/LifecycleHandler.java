@@ -61,13 +61,16 @@ public class LifecycleHandler extends Fragment implements ActivityLifecycleCallb
         Router router = mRouterMap.get(getRouterHashKey(container));
         if (router == null) {
             router = new Router();
+            router.setHost(this, container);
+
             if (savedInstanceState != null) {
                 router.onRestoreInstanceState(savedInstanceState);
             }
             mRouterMap.put(getRouterHashKey(container), router);
+        } else {
+            router.setHost(this, container);
         }
 
-        router.setHost(this, container);
         return router;
     }
 

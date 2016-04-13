@@ -54,6 +54,7 @@ public abstract class Controller {
     private final Bundle mArgs;
 
     private Bundle mViewState;
+    private Bundle mSavedInstanceState;
     private boolean mIsBeingDestroyed;
     private boolean mDestroyed;
     private boolean mAttached;
@@ -646,16 +647,20 @@ public abstract class Controller {
     }
 
     final void setRouter(@NonNull Router router) {
-        mRouter = router;
+        if (mRouter != router) {
+            mRouter = router;
 
-        for (RouterRequiringFunc listener : mOnRouterSetListeners) {
-            listener.execute();
-        }
-        mOnRouterSetListeners.clear();
+            for (RouterRequiringFunc listener : mOnRouterSetListeners) {
+                listener.execute();
+            }
+            mOnRouterSetListeners.clear();
 
-        for (ChildControllerTransaction child : mChildControllers) {
-            child.controller.setRouter(router);
+            for (ChildControllerTransaction child : mChildControllers) {
+                child.controller.setRouter(router);
+            }
         }
+
+        performOnRestoreInstanceState();
     }
 
     final void executeWithRouter(@NonNull RouterRequiringFunc listener) {
@@ -975,11 +980,19 @@ public abstract class Controller {
             addChildController(new ChildControllerTransaction(childBundle));
         }
 
-        Bundle savedState = savedInstanceState.getBundle(KEY_SAVED_STATE);
-        onRestoreInstanceState(savedState);
+        mSavedInstanceState = savedInstanceState.getBundle(KEY_SAVED_STATE);
+        performOnRestoreInstanceState();
+    }
 
-        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
-            lifecycleListener.onRestoreInstanceState(this, savedState);
+    private void performOnRestoreInstanceState() {
+        if (mSavedInstanceState != null && mRouter != null) {
+            onRestoreInstanceState(mSavedInstanceState);
+
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.onRestoreInstanceState(this, mSavedInstanceState);
+            }
+
+            mSavedInstanceState = null;
         }
     }
 

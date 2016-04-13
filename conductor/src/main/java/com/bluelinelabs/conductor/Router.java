@@ -403,6 +403,11 @@ public class Router {
 
     public final void onRestoreInstanceState(Bundle savedInstanceState) {
         mBackStack.restoreInstanceState(savedInstanceState);
+
+        Iterator<RouterTransaction> backstackIterator = mBackStack.reverseIterator();
+        while (backstackIterator.hasNext()) {
+            backstackIterator.next().controller.setRouter(this);
+        }
     }
 
     public final void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
