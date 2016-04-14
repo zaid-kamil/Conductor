@@ -650,6 +650,8 @@ public abstract class Controller {
         if (mRouter != router) {
             mRouter = router;
 
+            performOnRestoreInstanceState();
+
             for (RouterRequiringFunc listener : mOnRouterSetListeners) {
                 listener.execute();
             }
@@ -658,9 +660,9 @@ public abstract class Controller {
             for (ChildControllerTransaction child : mChildControllers) {
                 child.controller.setRouter(router);
             }
+        } else {
+            performOnRestoreInstanceState();
         }
-
-        performOnRestoreInstanceState();
     }
 
     final void executeWithRouter(@NonNull RouterRequiringFunc listener) {
