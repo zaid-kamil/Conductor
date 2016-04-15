@@ -907,6 +907,10 @@ public abstract class Controller {
                 child.controller.saveViewState(child.controller.mView);
             }
         }
+
+        for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+            lifecycleListener.onSaveViewState(this, mViewState);
+        }
     }
 
     final void restoreViewState(@NonNull View view) {
@@ -918,6 +922,10 @@ public abstract class Controller {
                 if (child.controller.mView != null) {
                     child.controller.restoreViewState(child.controller.mView);
                 }
+            }
+
+            for (LifecycleListener lifecycleListener : mLifecycleListeners) {
+                lifecycleListener.onRestoreViewState(this, mViewState);
             }
         }
     }
@@ -1074,6 +1082,9 @@ public abstract class Controller {
 
         public void onSaveInstanceState(@NonNull Controller controller, @NonNull Bundle outState) { }
         public void onRestoreInstanceState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) { }
+
+        public void onSaveViewState(@NonNull Controller controller, @NonNull Bundle outState) { }
+        public void onRestoreViewState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) { }
     }
 
 }
