@@ -1,7 +1,6 @@
 package com.bluelinelabs.conductor;
 
 import android.app.Application;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -125,12 +124,7 @@ public class ControllerTests {
 
         assertCalls(expectedCallState, controller);
 
-        final int currentOrientation = mActivityController.get().getResources().getConfiguration().orientation;
-        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mApplication.getResources().getConfiguration().orientation = Configuration.ORIENTATION_PORTRAIT;
-        } else {
-            mApplication.getResources().getConfiguration().orientation = Configuration.ORIENTATION_LANDSCAPE;
-        }
+        mActivityController.get().isChangingConfigurations = true;
 
         Bundle bundle = new Bundle();
         mActivityController.saveInstanceState(bundle);
@@ -146,8 +140,8 @@ public class ControllerTests {
         assertCalls(expectedCallState, controller);
 
         mActivityController.destroy();
+        expectedCallState.saveViewStateCalls++;
         expectedCallState.destroyViewCalls++;
-        expectedCallState.destroyCalls++;
         assertCalls(expectedCallState, controller);
 
         createActivityController(bundle);
@@ -323,8 +317,8 @@ public class ControllerTests {
     }
 
     private void assertCalls(CallState callState, TestController controller) {
-        Assert.assertEquals("Expected " + callState + ", controller has " + controller.currentCallState, callState, controller.currentCallState);
-        Assert.assertEquals("Expected " + callState + ", callbacks have " + mCurrentCallState, callState, mCurrentCallState);
+        Assert.assertEquals("Expected call counts and controller call counts do not match.", callState, controller.currentCallState);
+        Assert.assertEquals("Expected call counts and lifecycle call counts do not match.", callState, mCurrentCallState);
     }
 
     private void attachLifecycleListener(Controller controller) {
@@ -372,6 +366,16 @@ public class ControllerTests {
             @Override
             public void onRestoreInstanceState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) {
                 mCurrentCallState.restoreInstanceStateCalls++;
+            }
+
+            @Override
+            public void onSaveViewState(@NonNull Controller controller, @NonNull Bundle outState) {
+                mCurrentCallState.saveViewStateCalls++;
+            }
+
+            @Override
+            public void onRestoreViewState(@NonNull Controller controller, @NonNull Bundle savedViewState) {
+                mCurrentCallState.restoreViewStateCalls++;
             }
         });
     }
