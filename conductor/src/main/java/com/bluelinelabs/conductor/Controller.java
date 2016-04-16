@@ -1084,7 +1084,7 @@ public abstract class Controller {
         public void onRestoreInstanceState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) { }
 
         public void onSaveViewState(@NonNull Controller controller, @NonNull Bundle outState) { }
-        public void onRestoreViewState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) { }
+        public void onRestoreViewState(@NonNull Controller controller, @NonNull Bundle savedViewState) { }
     }
 
 }
