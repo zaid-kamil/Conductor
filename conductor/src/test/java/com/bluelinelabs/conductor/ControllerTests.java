@@ -130,6 +130,7 @@ public class ControllerTests {
         mActivityController.saveInstanceState(bundle);
 
         expectedCallState.detachCalls++;
+        expectedCallState.saveViewStateCalls++;
         expectedCallState.saveInstanceStateCalls++;
         assertCalls(expectedCallState, controller);
 
@@ -140,7 +141,6 @@ public class ControllerTests {
         assertCalls(expectedCallState, controller);
 
         mActivityController.destroy();
-        expectedCallState.saveViewStateCalls++;
         expectedCallState.destroyViewCalls++;
         assertCalls(expectedCallState, controller);
 
@@ -148,12 +148,14 @@ public class ControllerTests {
         controller = (TestController)mRouter.getControllerWithTag("root");
 
         expectedCallState.restoreInstanceStateCalls++;
+        expectedCallState.restoreViewStateCalls++;
         expectedCallState.changeStartCalls++;
         expectedCallState.changeEndCalls++;
         expectedCallState.createViewCalls++;
 
         // Lifecycle listener isn't attached during restore, grab the current views from the controller for this stuff...
         mCurrentCallState.restoreInstanceStateCalls = controller.currentCallState.restoreInstanceStateCalls;
+        mCurrentCallState.restoreViewStateCalls = controller.currentCallState.restoreViewStateCalls;
         mCurrentCallState.changeStartCalls = controller.currentCallState.changeStartCalls;
         mCurrentCallState.changeEndCalls = controller.currentCallState.changeEndCalls;
         mCurrentCallState.createViewCalls = controller.currentCallState.createViewCalls;
@@ -182,11 +184,9 @@ public class ControllerTests {
         mActivityController.pause();
 
         Bundle bundle = new Bundle();
-        ViewUtils.setAttached(controller.getView(), false);
         mActivityController.saveInstanceState(bundle);
 
         expectedCallState.detachCalls++;
-        expectedCallState.destroyViewCalls++;
         expectedCallState.saveInstanceStateCalls++;
         expectedCallState.saveViewStateCalls++;
         assertCalls(expectedCallState, controller);
