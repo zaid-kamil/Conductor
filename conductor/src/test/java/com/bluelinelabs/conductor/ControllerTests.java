@@ -1,6 +1,9 @@
 package com.bluelinelabs.conductor;
 
-import android.app.Activity;
+import android.app.Application;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,78 +27,147 @@ import org.robolectric.util.ActivityController;
 @Config(manifest = Config.NONE)
 public class ControllerTests {
 
+    private Application mApplication;
     private ActivityController<TestActivity> mActivityController;
     private Router mRouter;
 
-    private int mChangeStartCalls;
-    private int mChangeEndCalls;
-    private int mCreateViewCalls;
-    private int mAttachCalls;
-    private int mDestroyViewCalls;
-    private int mDetachCalls;
-    private int mDestroyCalls;
+    private CallState mCurrentCallState;
+
+    public void createActivityController(Bundle savedInstanceState) {
+        mActivityController = Robolectric.buildActivity(TestActivity.class).create(savedInstanceState).withApplication(mApplication).start();
+
+        @IdRes int containerId = 4;
+        FrameLayout routerContainer = new FrameLayout(mActivityController.get());
+        routerContainer.setId(containerId);
+
+        mRouter = Conductor.attachRouter(mActivityController.get(), routerContainer, savedInstanceState);
+        if (!mRouter.hasRootController()) {
+            mRouter.setRoot(new TestController());
+        }
+    }
 
     @Before
     public void setup() {
-        mActivityController = Robolectric.buildActivity(TestActivity.class).create();
-        Activity activity = mActivityController.get();
-        mRouter = Conductor.attachRouter(activity, new FrameLayout(activity), null);
-        mRouter.setRoot(new TestController());
+        mApplication = new Application();
 
-        mChangeStartCalls = 0;
-        mChangeEndCalls = 0;
-        mCreateViewCalls = 0;
-        mAttachCalls = 0;
-        mDestroyViewCalls = 0;
-        mDestroyCalls = 0;
-        mDestroyCalls = 0;
+        createActivityController(null);
+
+        mCurrentCallState = new CallState();
     }
 
     @Test
     public void testNormalLifecycle() {
-        Controller controller = new TestController();
+        TestController controller = new TestController();
         attachLifecycleListener(controller);
 
-        assertCalls(0, 0, 0, 0, 0, 0, 0);
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, controller);
         mRouter.pushController(RouterTransaction.builder(controller)
-                .pushChangeHandler(getPushHandler(0, 0, 0, 0, 0, 0, 0))
-                .popChangeHandler(getPopHandler(1, 1, 1, 1, 0, 0, 0))
+                .pushChangeHandler(getPushHandler(expectedCallState, controller))
+                .popChangeHandler(getPopHandler(expectedCallState, controller))
                 .build()
         );
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, controller);
 
         mRouter.popCurrentController();
 
         Assert.assertNull(controller.getView());
 
-        assertCalls(2, 2, 1, 1, 1, 1, 1);
+        assertCalls(expectedCallState, controller);
     }
 
     @Test
     public void testLifecycleWithActivityDestroy() {
-        Controller controller = new TestController();
+        TestController controller = new TestController();
         attachLifecycleListener(controller);
 
-        assertCalls(0, 0, 0, 0, 0, 0, 0);
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, controller);
         mRouter.pushController(RouterTransaction.builder(controller)
-                .pushChangeHandler(getPushHandler(0, 0, 0, 0, 0, 0, 0))
+                .pushChangeHandler(getPushHandler(expectedCallState, controller))
                 .build()
         );
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, controller);
 
         mActivityController.pause();
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, controller);
 
         mActivityController.stop();
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, controller);
 
         mActivityController.destroy();
 
-        assertCalls(1, 1, 1, 1, 1, 1, 1);
+        expectedCallState.detachCalls++;
+        expectedCallState.destroyViewCalls++;
+        expectedCallState.destroyCalls++;
+        assertCalls(expectedCallState, controller);
+    }
+
+    @Test
+    public void testLifecycleWithActivityConfigurationChange() {
+        TestController controller = new TestController();
+        attachLifecycleListener(controller);
+
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, controller);
+        mRouter.pushController(RouterTransaction.builder(controller)
+                .pushChangeHandler(getPushHandler(expectedCallState, controller))
+                .tag("root")
+                .build()
+        );
+
+        assertCalls(expectedCallState, controller);
+
+        final int currentOrientation = mActivityController.get().getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mApplication.getResources().getConfiguration().orientation = Configuration.ORIENTATION_PORTRAIT;
+        } else {
+            mApplication.getResources().getConfiguration().orientation = Configuration.ORIENTATION_LANDSCAPE;
+        }
+
+        Bundle bundle = new Bundle();
+        mActivityController.saveInstanceState(bundle);
+
+        expectedCallState.detachCalls++;
+        expectedCallState.saveInstanceStateCalls++;
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.pause();
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.stop();
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.destroy();
+        expectedCallState.destroyViewCalls++;
+        expectedCallState.destroyCalls++;
+        assertCalls(expectedCallState, controller);
+
+        createActivityController(bundle);
+        controller = (TestController)mRouter.getControllerWithTag("root");
+
+        expectedCallState.restoreInstanceStateCalls++;
+        expectedCallState.changeStartCalls++;
+        expectedCallState.changeEndCalls++;
+        expectedCallState.createViewCalls++;
+
+        // Lifecycle listener isn't attached during restore, grab the current views from the controller for this stuff...
+        mCurrentCallState.restoreInstanceStateCalls = controller.currentCallState.restoreInstanceStateCalls;
+        mCurrentCallState.changeStartCalls = controller.currentCallState.changeStartCalls;
+        mCurrentCallState.changeEndCalls = controller.currentCallState.changeEndCalls;
+        mCurrentCallState.createViewCalls = controller.currentCallState.createViewCalls;
+
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.resume();
+        assertCalls(expectedCallState, controller);
     }
 
     @Test
@@ -112,22 +184,24 @@ public class ControllerTests {
                 }))
                 .build());
 
-        Controller child = new TestController();
+        TestController child = new TestController();
         attachLifecycleListener(child);
 
-        assertCalls(0, 0, 0, 0, 0, 0, 0);
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, child);
 
         parent.addChildController(ChildControllerTransaction.builder(child, TestController.VIEW_ID)
-                .pushChangeHandler(getPushHandler(0, 0, 0, 0, 0, 0, 0))
-                .popChangeHandler(getPopHandler(1, 1, 1, 1, 0, 0, 0))
+                .pushChangeHandler(getPushHandler(expectedCallState, child))
+                .popChangeHandler(getPopHandler(expectedCallState, child))
                 .build()
         );
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, child);
 
         parent.removeChildController(child);
 
-        assertCalls(2, 2, 1, 1, 1, 1, 1);
+        assertCalls(expectedCallState, child);
     }
 
     @Test
@@ -152,23 +226,28 @@ public class ControllerTests {
                 }))
                 .build());
 
-        Controller child = new TestController();
+        TestController child = new TestController();
         attachLifecycleListener(child);
 
-        assertCalls(0, 0, 0, 0, 0, 0, 0);
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, child);
 
         parent.addChildController(ChildControllerTransaction.builder(child, TestController.VIEW_ID)
-                .pushChangeHandler(getPushHandler(0, 0, 0, 0, 0, 0, 0))
-                .popChangeHandler(getPopHandler(1, 1, 1, 1, 0, 0, 0))
+                .pushChangeHandler(getPushHandler(expectedCallState, child))
+                .popChangeHandler(getPopHandler(expectedCallState, child))
                 .build()
         );
 
-        assertCalls(1, 1, 1, 1, 0, 0, 0);
+        assertCalls(expectedCallState, child);
 
         mRouter.popCurrentController();
         ViewUtils.setAttached(child.getView(), false);
 
-        assertCalls(1, 1, 1, 1, 1, 1, 1);
+        expectedCallState.detachCalls++;
+        expectedCallState.destroyViewCalls++;
+        expectedCallState.destroyCalls++;
+        assertCalls(expectedCallState, child);
     }
 
     @Test
@@ -199,77 +278,100 @@ public class ControllerTests {
         Assert.assertNull(controller.getView());
     }
 
-    private ChangeHandler getPushHandler(final int changeStart, final int changeEnd, final int bindView, final int attach, final int unbindView, final int detach, final int destroy) {
+    private ChangeHandler getPushHandler(final CallState expectedCallState, final TestController controller) {
         return new ChangeHandler(new ChangeHandlerListener() {
             @Override
             public void performChange(@NonNull ViewGroup container, View from, View to, boolean isPush, @NonNull ControllerChangeCompletedListener changeListener) {
-                assertCalls(changeStart + 1, changeEnd, bindView + 1, attach, unbindView, detach, destroy);
+                expectedCallState.changeStartCalls++;
+                expectedCallState.createViewCalls++;
+                assertCalls(expectedCallState, controller);
+
                 container.addView(to);
                 ViewUtils.setAttached(to, true);
-                assertCalls(changeStart + 1, changeEnd, bindView + 1, attach + 1, unbindView, detach, destroy);
+
+                expectedCallState.attachCalls++;
+                assertCalls(expectedCallState, controller);
+
                 changeListener.onChangeCompleted();
+
+                expectedCallState.changeEndCalls++;
+                assertCalls(expectedCallState, controller);
             }
         });
     }
 
-    private ChangeHandler getPopHandler(final int changeStart, final int changeEnd, final int bindView, final int attach, final int unbindView, final int detach, final int destroy) {
+    private ChangeHandler getPopHandler(final CallState expectedCallState, final TestController controller) {
         return new ChangeHandler(new ChangeHandlerListener() {
             @Override
             public void performChange(@NonNull ViewGroup container, View from, View to, boolean isPush, @NonNull ControllerChangeCompletedListener changeListener) {
-                assertCalls(changeStart + 1, changeEnd, bindView, attach, unbindView, detach, destroy);
+                expectedCallState.changeStartCalls++;
+                assertCalls(expectedCallState, controller);
                 container.removeView(from);
                 ViewUtils.setAttached(from, false);
-                assertCalls(changeStart + 1, changeEnd, bindView, attach, unbindView + 1, detach + 1, destroy + 1);
+
+                expectedCallState.destroyViewCalls++;
+                expectedCallState.detachCalls++;
+                expectedCallState.destroyCalls++;
+                assertCalls(expectedCallState, controller);
+
                 changeListener.onChangeCompleted();
+
+                expectedCallState.changeEndCalls++;
+                assertCalls(expectedCallState, controller);
             }
         });
     }
 
-    private void assertCalls(int changeStart, int changeEnd, int bindView, int attach, int unbindView, int detach, int destroy) {
-        Assert.assertEquals(changeStart, mChangeStartCalls);
-        Assert.assertEquals(changeEnd, mChangeEndCalls);
-        Assert.assertEquals(bindView, mCreateViewCalls);
-        Assert.assertEquals(attach, mAttachCalls);
-        Assert.assertEquals(unbindView, mDestroyViewCalls);
-        Assert.assertEquals(detach, mDetachCalls);
-        Assert.assertEquals(destroy, mDestroyCalls);
+    private void assertCalls(CallState callState, TestController controller) {
+        Assert.assertEquals("Expected " + callState + ", controller has " + controller.currentCallState, callState, controller.currentCallState);
+        Assert.assertEquals("Expected " + callState + ", callbacks have " + mCurrentCallState, callState, mCurrentCallState);
     }
 
     private void attachLifecycleListener(Controller controller) {
         controller.addLifecycleListener(new LifecycleListener() {
             @Override
             public void onChangeStart(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
-                mChangeStartCalls++;
+                mCurrentCallState.changeStartCalls++;
             }
 
             @Override
             public void onChangeEnd(@NonNull Controller controller, @NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
-                mChangeEndCalls++;
+                mCurrentCallState.changeEndCalls++;
             }
 
             @Override
             public void postCreateView(@NonNull Controller controller, @NonNull View view) {
-                mCreateViewCalls++;
+                mCurrentCallState.createViewCalls++;
             }
 
             @Override
             public void postAttach(@NonNull Controller controller, @NonNull View view) {
-                mAttachCalls++;
+                mCurrentCallState.attachCalls++;
             }
 
             @Override
             public void postDestroyView(@NonNull Controller controller) {
-                mDestroyViewCalls++;
+                mCurrentCallState.destroyViewCalls++;
             }
 
             @Override
             public void postDetach(@NonNull Controller controller, @NonNull View view) {
-                mDetachCalls++;
+                mCurrentCallState.detachCalls++;
             }
 
             @Override
             public void postDestroy(@NonNull Controller controller) {
-                mDestroyCalls++;
+                mCurrentCallState.destroyCalls++;
+            }
+
+            @Override
+            public void onSaveInstanceState(@NonNull Controller controller, @NonNull Bundle outState) {
+                mCurrentCallState.saveInstanceStateCalls++;
+            }
+
+            @Override
+            public void onRestoreInstanceState(@NonNull Controller controller, @NonNull Bundle savedInstanceState) {
+                mCurrentCallState.restoreInstanceStateCalls++;
             }
         });
     }
@@ -293,4 +395,5 @@ public class ControllerTests {
             mListener.performChange(container, from, to, isPush, changeListener);
         }
     }
+
 }
