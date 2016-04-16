@@ -165,6 +165,38 @@ public class ControllerTests {
     }
 
     @Test
+    public void testLifecycleWithActivityBackground() {
+        TestController controller = new TestController();
+        attachLifecycleListener(controller);
+
+        CallState expectedCallState = new CallState();
+
+        assertCalls(expectedCallState, controller);
+        mRouter.pushController(RouterTransaction.builder(controller)
+                .pushChangeHandler(getPushHandler(expectedCallState, controller))
+                .build()
+        );
+
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.pause();
+
+        Bundle bundle = new Bundle();
+        ViewUtils.setAttached(controller.getView(), false);
+        mActivityController.saveInstanceState(bundle);
+
+        expectedCallState.detachCalls++;
+        expectedCallState.destroyViewCalls++;
+        expectedCallState.saveInstanceStateCalls++;
+        expectedCallState.saveViewStateCalls++;
+        assertCalls(expectedCallState, controller);
+
+        mActivityController.resume();
+        expectedCallState.createViewCalls++;
+        expectedCallState.restoreViewStateCalls++;
+    }
+
+    @Test
     public void testChildLifecycle() {
         Controller parent = new TestController();
         mRouter.pushController(RouterTransaction.builder(parent)
